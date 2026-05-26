@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
   --background: #ffffff;
@@ -12,15 +13,121 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Tiptap editor base styles */
+.tiptap {
+  outline: none;
+}
+
+/* Placeholder on any empty paragraph (Notion style) */
+.tiptap p.is-empty::before,
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #b0b7c0;
+  pointer-events: none;
+  height: 0;
+}
+
+/* Notion-like editor appearance — shared base */
+.notion-editor {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  color: #37352f;
+  caret-color: #1a1a1a;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+  position: relative;
+  z-index: 1;
+}
+
+/* Pageless: fluid, minimal padding, no background */
+.notion-editor-pageless {
+  padding: 4rem 2rem 24rem;
+}
+
+/* A4 page: document-style margins matching print layout (pageless mode) */
+.notion-editor-page {
+  padding: 3rem 4rem 24rem;
+  min-height: 1123px; /* A4 height at 96dpi */
+}
+
+/* Per-page card editor in multi-page mode (fixed A4 card, no extra scroll space) */
+.notion-editor-page-card {
+  padding: 3rem 4rem;
+}
+
+/* Headings, paragraphs, lists etc. always own a full row.
+   flex-shrink:0 means they CANNOT be crushed to zero by a sibling block. */
+.notion-editor > *:not([data-question-block]) {
+  flex: 0 0 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.notion-editor > * + * {
+  margin-top: 0.15em;
+}
+
+/* Smooth selection highlight */
+.notion-editor ::selection {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+/* Ensure the editor fills space properly */
+.tiptap-editor-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Table styles inside editor */
+.tiptap table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.tiptap table td,
+.tiptap table th {
+  min-width: 1em;
+  border: 1px solid #d1d5db;
+  padding: 4px 8px;
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.tiptap table th {
+  font-weight: 600;
+  background-color: #f9fafb;
+}
+
+.tiptap table .selectedCell:after {
+  z-index: 2;
+  position: absolute;
+  content: "";
+  left: 0; right: 0; top: 0; bottom: 0;
+  background: rgba(59, 130, 246, 0.1);
+  pointer-events: none;
+}
+
+/* Horizontal rule */
+.tiptap hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 1.5rem 0;
+}
+
+/* Lift TipTap's Tippy bubble menu above the editor stacking context */
+.tippy-box {
+  z-index: 9999 !important;
 }
