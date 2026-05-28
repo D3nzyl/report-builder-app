@@ -647,15 +647,58 @@ Let creators choose between a pageless scrolling canvas and a paginated A4 canva
 ## [RB2-FR12] Report Preview
 
 ### Purpose
-Let creators see how the report looks with sample data before exporting.
+Let solution creators see how the end user will experience the report once their form answers are submitted. The preview simulates the end-user report viewer — not an A4 export view.
 
 ### Expected Behaviour
 
+**Opening preview**
 - A Preview button in the toolbar opens a full-screen overlay
-- The preview renders the template with all variables replaced by their sample answers
-- Approval blocks, multi-field tables, inline chips, and remarks sections all render as they would in the export
-- Closing and reopening picks up any changes made since the last open
-- A label indicates sample answers are in use
+- All variables in the template are replaced with their configured sample answers
+- Closing and reopening reflects any changes made to the template since the last open
+
+**Device toggle**
+- The preview has a toggle to switch between **Phone** and **Laptop** views
+- Phone view renders the report inside an iOS-style phone mockup (9:19.5 aspect ratio)
+- Laptop view renders the report inside a macOS-style browser window mockup
+- Both views use a pageless, full-width layout — no A4 page framing
+
+**Pageless layout**
+- All question blocks render stacked full-width regardless of their configured column widths in the editor
+- Approval blocks stack their fields vertically for readability on small screens
+- Tables scroll horizontally if they overflow the available width
+
+**Download button**
+- A Download PDF button is visible inside the preview UI (within the phone nav bar or browser toolbar)
+- This simulates the download action available to the end user in the live viewer
+- Clicking it generates a PDF at A4 dimensions using the same sample answers
+
+**Phone view design**
+```
+┌─────────────────────────────┐
+│  9:41          ▌▌▌  🔋      │  ← status bar
+│  ─────────────────────────  │
+│  ←     Report         [⬇]  │  ← app nav bar with download button
+│  ─────────────────────────  │
+│                             │
+│  [scrollable report         │
+│   content — full width,     │
+│   pageless]                 │
+│                             │
+│  ────────────               │  ← home indicator
+└─────────────────────────────┘
+```
+
+**Laptop view design**
+```
+┌─────────────────────────────────────────────┐
+│  🔴 🟡 🟢   [ app.example.com/report/... ]  [⬇ Download PDF] │
+│  ───────────────────────────────────────── │
+│                                             │
+│  [scrollable report content — max-width     │
+│   centered, pageless]                       │
+│                                             │
+└─────────────────────────────────────────────┘
+```
 
 ---
 
