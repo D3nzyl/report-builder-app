@@ -154,7 +154,7 @@ function answerHtml(value: string | string[] | undefined, type: QuestionType): s
 
 const APPROVAL_ROW_H = 72;
 
-function approvalHtml(raw: string | string[] | undefined): string {
+function approvalHtml(raw: string | string[] | undefined, pageless = false): string {
   let data: ApprovalAnswer | null = null;
   try { data = JSON.parse(raw as string); } catch { /* fall through */ }
 
@@ -191,6 +191,21 @@ function approvalHtml(raw: string | string[] | undefined): string {
         </div>
       </div>`
     : "";
+
+  if (pageless) {
+    return `<div style="width:100%;display:flex;flex-direction:column;gap:8px;">
+      <div style="${fieldStyle}">
+        <div style="${labelStyle}">${personLabel}</div>
+        <div style="${valueStyle}">${esc(data.person || "—")}</div>
+      </div>
+      <div style="${fieldStyle}">
+        <div style="${labelStyle}">Date</div>
+        <div style="${valueStyle}">${esc(data.date || "—")}</div>
+      </div>
+      ${thirdCell}
+      ${imagesBlock}
+    </div>`;
+  }
 
   return `<div style="width:100%;">
     <div style="display:flex;align-items:stretch;gap:8px;width:100%;height:${APPROVAL_ROW_H}px;box-sizing:border-box;">
@@ -271,7 +286,7 @@ function multiFieldHtml(question: FormQuestion, answers: FormAnswers, label: str
       }).join("")}</tr>`
     ).join("");
 
-    return `<div style="margin-top:8px;"><table style="border-collapse:collapse;table-layout:fixed;width:100%;font-size:12px;">${colgroup}<thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    return `<div style="margin-top:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;"><table style="border-collapse:collapse;table-layout:fixed;width:100%;min-width:360px;font-size:12px;">${colgroup}<thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 
   // Stacked sub-field blocks
@@ -355,7 +370,7 @@ function blockToHtml(node: JSONContent, answers: FormAnswers, questions: FormQue
         }).join("");
         return `<tr>${cells}</tr>`;
       }).join("");
-      return `<div style="width:100%;overflow-x:auto;margin:8px 0;"><table style="border-collapse:collapse;width:100%;font-size:13px;">${rows}</table></div>`;
+      return `<div style="width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:8px 0;"><table style="border-collapse:collapse;min-width:100%;font-size:13px;">${rows}</table></div>`;
     }
 
     case "questionVariableBlock": {
@@ -365,7 +380,7 @@ function blockToHtml(node: JSONContent, answers: FormAnswers, questions: FormQue
 
       let valueHtml: string;
       if (isApproval) {
-        valueHtml = approvalHtml(answers[variableKey as string]);
+        valueHtml = approvalHtml(answers[variableKey as string], pageless);
       } else if (question?.multiField && (question.subFields?.length ?? 0) > 0) {
         valueHtml = multiFieldHtml(question, answers, label as string);
       } else if (question?.multiResponse) {
