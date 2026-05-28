@@ -3,15 +3,21 @@
 import { NodeViewWrapper } from "@tiptap/react";
 import type { NodeViewProps } from "@tiptap/react";
 import { useState, useRef, useEffect } from "react";
-import { MoreHorizontal, Trash2, AlignJustify, Type } from "lucide-react";
+import { MoreHorizontal, Trash2, AlignJustify, Type, MessageSquare, ImageIcon } from "lucide-react";
+import { useQuestions } from "@/lib/questionContext";
 
-export function VariableInlineView({ node, editor, getPos, deleteNode }: NodeViewProps) {
-  const { label, variableKey, questionType, questionId } = node.attrs as {
+export function VariableInlineView({ node, editor, getPos, deleteNode, updateAttributes }: NodeViewProps) {
+  const { label, variableKey, questionType, questionId, displayType } = node.attrs as {
     label: string;
     variableKey: string;
     questionType: string;
     questionId: string;
+    displayType: string;
   };
+
+  const { questions } = useQuestions();
+  const question = questions.find(q => q.id === questionId);
+  const allowRemarks = question?.allowRemarks === true;
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -52,6 +58,11 @@ export function VariableInlineView({ node, editor, getPos, deleteNode }: NodeVie
     return () => document.removeEventListener("mousedown", handleDown);
   }, [menuOpen]);
 
+  function switchDisplayType(type: string) {
+    updateAttributes({ displayType: type });
+    setMenuOpen(false);
+  }
+
   function switchToBlock() {
     const pos = getPos();
     if (pos === undefined || !editor) return;
@@ -73,8 +84,13 @@ export function VariableInlineView({ node, editor, getPos, deleteNode }: NodeVie
   const chipBg = isInSelection ? "#eff6ff" : "#f3f4f6";
   const chipBorder = isInSelection ? "#93c5fd" : "#e5e7eb";
   const chipColor = isInSelection ? "#1d4ed8" : "#374151";
-  // The 3-dot overlay uses a slightly darker shade of the chip background
   const dotBg = isInSelection ? "#dbeafe" : "#e5e7eb";
+
+  const chipSuffix = displayType === "inline_remarks"
+    ? " · remarks"
+    : displayType === "inline_remarks_image"
+      ? " · image"
+      : "";
 
   return (
     <NodeViewWrapper as="span" className="inline-flex items-center" contentEditable={false}>
@@ -98,7 +114,7 @@ export function VariableInlineView({ node, editor, getPos, deleteNode }: NodeVie
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => { if (!menuOpen) setHovered(false); }}
       >
-        {label}
+        {label}{chipSuffix && <span style={{ opacity: 0.55, fontSize: "0.85em" }}>{chipSuffix}</span>}
 
         {/* 3-dot: absolutely fills the right side of the chip, same height */}
         <span
@@ -122,24 +138,48 @@ export function VariableInlineView({ node, editor, getPos, deleteNode }: NodeVie
           </button>
 
           {menuOpen && (
-            <span className="absolute left-0 top-[calc(100%+4px)] z-50 bg-white border border-gray-200 rounded-lg shadow-lg py-0.5 w-32 flex flex-col">
+            <span className="absolute left-0 top-[calc(100%+4px)] z-50 bg-white border border-gray-200 rounded-lg shadow-lg py-0.5 w-40 flex flex-col">
               <span className="px-2.5 py-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
-                Display as
+                Show
               </span>
               <button
                 className="flex items-center gap-2 px-2.5 py-1.5 hover:bg-gray-50 text-gray-700 text-left text-xs"
-                onMouseDown={(e) => { e.preventDefault(); setMenuOpen(false); }}
+                onMouseDown={(e) => { e.preventDefault(); switchDisplayType("inline_value"); }}
               >
                 <Type size={11} className="text-gray-400 flex-shrink-0" />
-                Inline
-                <span className="ml-auto text-gray-400 text-[10px]">✓</span>
+                Answer
+                {(!displayType || displayType === "inline_value") && <span className="ml-auto text-gray-400 text-[10px]">✓</span>}
               </button>
+              {allowRemarks && (
+                <button
+                  className="flex items-center gap-2 px-2.5 py-1.5 hover:bg-gray-50 text-gray-700 text-left text-xs"
+                  onMouseDown={(e) => { e.preventDefault(); switchDisplayType("inline_remarks"); }}
+                >
+                  <MessageSquare size={11} className="text-gray-400 flex-shrink-0" />
+                  Remarks
+                  {displayType === "inline_remarks" && <span className="ml-auto text-gray-400 text-[10px]">✓</span>}
+                </button>
+              )}
+              {allowRemarks && (
+                <button
+                  className="flex items-center gap-2 px-2.5 py-1.5 hover:bg-gray-50 text-gray-700 text-left text-xs"
+                  onMouseDown={(e) => { e.preventDefault(); switchDisplayType("inline_remarks_image"); }}
+                >
+                  <ImageIcon size={11} className="text-gray-400 flex-shrink-0" />
+                  Remarks Image
+                  {displayType === "inline_remarks_image" && <span className="ml-auto text-gray-400 text-[10px]">✓</span>}
+                </button>
+              )}
+              <span className="border-t border-gray-100 my-0.5" />
+              <span className="px-2.5 py-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+                Layout
+              </span>
               <button
                 className="flex items-center gap-2 px-2.5 py-1.5 hover:bg-gray-50 text-gray-700 text-left text-xs"
                 onMouseDown={(e) => { e.preventDefault(); switchToBlock(); }}
               >
                 <AlignJustify size={11} className="text-gray-400 flex-shrink-0" />
-                Block
+                Switch to Block
               </button>
               <span className="border-t border-gray-100 my-0.5" />
               <button

@@ -28,7 +28,7 @@ export interface ApprovalAnswer {
   images?: string[];
 }
 
-export type DisplayType = "inline_value" | "question_answer_block";
+export type DisplayType = "inline_value" | "inline_remarks" | "inline_remarks_image" | "question_answer_block";
 
 export interface SubField {
   id: string;
@@ -48,6 +48,7 @@ export interface FormQuestion {
   multiResponse?: boolean;
   multiField?: boolean;
   subFields?: SubField[];
+  allowRemarks?: boolean;
   columnHeaders?: Record<string, string>;
   columnOrder?: string[];         // ordered visible sub-field variableKeys; undefined = all in original order
   columnWidths?: Record<string, number>; // sub-field variableKey → pixel width

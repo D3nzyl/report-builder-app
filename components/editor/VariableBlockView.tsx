@@ -614,6 +614,7 @@ export function VariableBlockView({ node, editor, getPos, deleteNode, updateAttr
   const isApproval = questionType === "approval";
   const isMultiField = question?.multiField === true;
   const isMultiResponse = question?.multiResponse === true;
+  const allowRemarks = question?.allowRemarks === true && !isApproval;
   const isFullWidth = isApproval || isMultiResponse;
   const subFields = question?.subFields ?? [];
 
@@ -761,6 +762,21 @@ export function VariableBlockView({ node, editor, getPos, deleteNode, updateAttr
           </div>
 
           {bodyContent}
+
+          {allowRemarks && (
+            <div className="mt-3 pt-3 border-t border-gray-100 space-y-2.5">
+              <div>
+                <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Remarks</div>
+                <TextPlaceholder lines={2} />
+              </div>
+              <div>
+                <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">
+                  Image <span className="font-normal normal-case">(optional)</span>
+                </div>
+                <ImagePlaceholder />
+              </div>
+            </div>
+          )}
         </div>
 
         <div onMouseDown={onResizeMouseDown}

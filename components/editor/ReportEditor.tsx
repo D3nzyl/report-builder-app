@@ -494,6 +494,10 @@ function QuestionCard({
     onUpdateQuestion(question.id, { multiField: !question.multiField });
   }
 
+  function toggleAllowRemarks() {
+    onUpdateQuestion(question.id, { allowRemarks: !question.allowRemarks });
+  }
+
   function addSubField() {
     const trimmed = newSfLabel.trim();
     if (!trimmed) return;
@@ -638,6 +642,20 @@ function QuestionCard({
         >
           <Columns size={9} />
           Multi Field
+        </button>
+      </div>
+      <div className="flex items-center gap-1.5 pt-1.5">
+        <button
+          onClick={toggleAllowRemarks}
+          title="Allow remarks and image for this question"
+          className={`flex-1 flex items-center justify-center gap-1 text-[10px] py-1 rounded border transition-colors ${
+            question.allowRemarks
+              ? "bg-amber-50 border-amber-300 text-amber-700 font-medium"
+              : "border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-600"
+          }`}
+        >
+          <AlignLeft size={9} />
+          Allow Remarks
         </button>
       </div>
 
