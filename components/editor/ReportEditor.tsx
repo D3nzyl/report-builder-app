@@ -1790,6 +1790,7 @@ export function ReportEditor() {
   const editorClass = "h-full prose prose-base max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h1:mb-2 prose-h1:mt-6 prose-h2:text-xl prose-h2:mt-5 prose-h2:mb-1.5 prose-h3:text-lg prose-h3:mt-4 prose-h3:mb-1 prose-p:leading-relaxed prose-p:my-1 prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:text-gray-600 prose-code:bg-gray-100 prose-code:rounded prose-code:px-1 prose-code:text-sm prose-pre:bg-gray-50 prose-pre:border prose-pre:border-gray-200";
 
   const headerActionsEl = mounted ? document.getElementById("header-actions") : null;
+  const headerCenterEl = mounted ? document.getElementById("header-center") : null;
 
   return (
     <QuestionsContext.Provider value={{ questions, answers, updateQuestion: handleUpdateQuestion, collections }}>
@@ -1854,15 +1855,16 @@ export function ReportEditor() {
               PDF
             </button>
 
-            <div className="w-px h-5 bg-gray-200" />
-
-            {/* Demo-only reset */}
-            <button onClick={handleReset} title="Reset to demo content"
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-dashed border-gray-300 text-gray-400 text-xs font-medium hover:border-gray-400 hover:text-gray-600 transition-colors">
-              <RotateCcw size={13} /> Reset Demo
-            </button>
           </div>,
           headerActionsEl,
+        )}
+
+        {headerCenterEl && createPortal(
+          <button onClick={handleReset} title="Reset to demo content"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-dashed border-gray-300 text-gray-400 text-xs font-medium hover:border-gray-400 hover:text-gray-600 transition-colors">
+            <RotateCcw size={13} /> Reset Demo
+          </button>,
+          headerCenterEl,
         )}
 
         {/* Hidden file input for Load */}

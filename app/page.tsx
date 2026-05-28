@@ -18,7 +18,7 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
       {/* Header */}
-      <header className="flex items-center gap-4 px-6 py-3 bg-white border-b border-gray-200 flex-shrink-0">
+      <header className="relative flex items-center gap-4 px-6 py-3 bg-white border-b border-gray-200 flex-shrink-0">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -36,6 +36,7 @@ export default function Home() {
           defaultValue="Inspection Report Template"
           className="w-72 text-sm font-medium text-gray-700 bg-transparent border-none outline-none focus:ring-1 focus:ring-blue-300 rounded px-1 py-0.5 hover:bg-gray-50"
         />
+        <div id="header-center" className="absolute left-1/2 -translate-x-1/2 flex items-center" />
         <div id="header-actions" className="ml-auto flex items-center gap-2" />
       </header>
 
