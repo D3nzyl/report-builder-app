@@ -189,57 +189,36 @@ function LocationPlaceholder() {
 
 const APPROVAL_ROW_H = 72;
 
-function ApprovalBlockPreview({ data }: { data: ApprovalAnswer | null }) {
-  const decision = data?.decision ?? "approved";
-  const personLabel = decision === "approved" ? "Approved by" : "Rejected by";
-
+function ApprovalBlockPreview() {
   return (
     <div className="mt-2 space-y-2">
-      {/* Fixed-height 3-column row: approved → name / date / signature  |  rejected → name / date / remarks */}
       <div className="flex gap-2 w-full" style={{ height: APPROVAL_ROW_H }}>
         <div className="flex-1 border border-gray-100 rounded-md px-3 py-2 bg-gray-50/70 min-w-0 flex flex-col">
-          <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">{personLabel}</div>
-          {data?.person
-            ? <div className="text-xs text-gray-700 font-medium truncate">{data.person}</div>
-            : <div className="h-2 rounded-full bg-gray-200 mt-1 w-3/4" />}
+          <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Approved / Rejected by</div>
+          <div className="h-2 rounded-full bg-gray-200 mt-1 w-3/4" />
         </div>
         <div className="flex-1 border border-gray-100 rounded-md px-3 py-2 bg-gray-50/70 min-w-0 flex flex-col">
           <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Date</div>
-          {data?.date
-            ? <div className="text-xs text-gray-700 truncate">{data.date}</div>
-            : <div className="h-2 rounded-full bg-gray-200 mt-1 w-2/3" />}
+          <div className="h-2 rounded-full bg-gray-200 mt-1 w-2/3" />
         </div>
-        {decision === "approved" ? (
-          <div className="flex-1 border border-gray-100 rounded-md px-3 py-2 bg-gray-50/70 min-w-0 flex flex-col">
-            <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Signature</div>
-            <div className="flex-1 rounded-lg border border-gray-200 bg-gray-50 overflow-hidden">
-              <svg width="100%" height="100%" viewBox="0 0 300 80" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
-                <path d="M 40 52 C 55 36, 62 28, 72 38 C 82 48, 78 58, 90 44 C 102 30, 108 26, 118 38 C 126 48, 122 56, 134 42 C 144 30, 152 26, 162 36 C 170 44, 168 54, 178 44"
-                  fill="none" stroke="#d1d5db" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                <line x1="24" y1="64" x2="276" y2="64" stroke="#e5e7eb" strokeWidth="1" />
-                <text x="150" y="76" textAnchor="middle" fill="#d1d5db" fontSize="9" fontFamily="sans-serif">Signature</text>
-              </svg>
-            </div>
+        <div className="flex-1 border border-gray-100 rounded-md px-3 py-2 bg-gray-50/70 min-w-0 flex flex-col">
+          <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Signature / Remarks</div>
+          <div className="flex-1 rounded-lg border border-gray-200 bg-gray-50 overflow-hidden">
+            <svg width="100%" height="100%" viewBox="0 0 300 80" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 40 52 C 55 36, 62 28, 72 38 C 82 48, 78 58, 90 44 C 102 30, 108 26, 118 38 C 126 48, 122 56, 134 42 C 144 30, 152 26, 162 36 C 170 44, 168 54, 178 44"
+                fill="none" stroke="#d1d5db" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              <line x1="24" y1="64" x2="276" y2="64" stroke="#e5e7eb" strokeWidth="1" />
+              <text x="150" y="76" textAnchor="middle" fill="#d1d5db" fontSize="9" fontFamily="sans-serif">Signature</text>
+            </svg>
           </div>
-        ) : (
-          <div className="flex-1 border border-gray-100 rounded-md px-3 py-2 bg-gray-50/70 min-w-0 flex flex-col overflow-hidden">
-            <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Remarks</div>
-            {data?.remarks
-              ? <div className="text-xs text-gray-600 leading-relaxed line-clamp-3">{data.remarks}</div>
-              : <TextPlaceholder lines={2} />}
-          </div>
-        )}
+        </div>
       </div>
-
-      {/* Images — rejected only, below the fixed row */}
-      {decision === "rejected" && (
-        <div className="border border-gray-100 rounded-md px-3 py-2 bg-gray-50/70 w-full">
-          <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">
-            Images <span className="font-normal normal-case">(optional)</span>
-          </div>
-          <ImagePlaceholder />
+      <div className="border border-gray-100 rounded-md px-3 py-2 bg-gray-50/70 w-full">
+        <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">
+          Images <span className="font-normal normal-case">(optional)</span>
         </div>
-      )}
+        <ImagePlaceholder />
+      </div>
     </div>
   );
 }
@@ -618,10 +597,6 @@ export function VariableBlockView({ node, editor, getPos, deleteNode, updateAttr
   const isFullWidth = isApproval || isMultiResponse;
   const subFields = question?.subFields ?? [];
 
-  const approvalData: ApprovalAnswer | null = isApproval
-    ? (() => { try { return JSON.parse(answers[variableKey] as string); } catch { return null; } })()
-    : null;
-
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
@@ -697,7 +672,7 @@ export function VariableBlockView({ node, editor, getPos, deleteNode, updateAttr
 
   let bodyContent: React.ReactNode;
   if (isApproval) {
-    bodyContent = <ApprovalBlockPreview data={approvalData} />;
+    bodyContent = <ApprovalBlockPreview />;
   } else if (isMultiField && isMultiResponse) {
     bodyContent = <MultiFieldTablePreview question={question!} updateQuestion={updateQuestion} />;
   } else if (isMultiField) {

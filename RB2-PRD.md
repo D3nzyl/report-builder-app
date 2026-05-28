@@ -48,14 +48,13 @@ Report Builder V2.0 provides the main editor framework for creating report templ
 [RB2-FR5] Multi-Response Variable Support
 [RB2-FR6] Multi-Field Variable Support
 [RB2-FR7] Multi-Field + Multi-Response Table View
-[RB2-FR8] Table Column Management
-[RB2-FR9] Remarks & Image Support
-[RB2-FR10] Approval Variable Blocks
-[RB2-FR11] Block Handle (Add & Drag)
-[RB2-FR12] Pageless / A4 Page Mode
-[RB2-FR13] Report Preview
-[RB2-FR14] Report Export (PDF)
-[RB2-FR15] Template Persistence (Save / Load JSON)
+[RB2-FR8] Remarks & Image Support
+[RB2-FR9] Approval Variable Blocks
+[RB2-FR10] Block Handle (Add & Drag)
+[RB2-FR11] Pageless / A4 Page Mode
+[RB2-FR12] Report Preview
+[RB2-FR13] Report Export (PDF)
+[RB2-FR14] Template Persistence (Save / Load JSON)
 
 ### Question Types
 
@@ -89,7 +88,7 @@ The following question types are supported across the form variable system. Each
 **Location**
 - location — GPS coordinates or address
 
-**Approval** *(special type — see RB2-FR10)*
+**Approval** *(special type — see RB2-FR9)*
 - approval — a structured approval decision (approved or rejected) with person, date, signature or remarks, and optional images
 
 
@@ -122,7 +121,7 @@ Replace the coordinate-based V1.0 canvas with a document editor that lets creato
 - Bubble menu appears on text selection for quick formatting
 - `/` command menu for block insertion
 - `@` mention menu for variable insertion (see RB2-FR2)
-- Block handle on hover for drag-reorder and inline block insertion (see RB2-FR11)
+- Block handle on hover for drag-reorder and inline block insertion (see RB2-FR10)
 
 ### / Slash Command Menu
 
@@ -217,7 +216,7 @@ Allow variables to appear embedded within sentences or paragraphs, rendering the
   - **Answer** — shows the answer value (default)
   - **Remarks** — shows the remarks text for that answer; chip label shows `{label} · remarks`
   - **Remarks Image** — shows the remarks image for that answer; chip label shows `{label} · image`
-- Remarks and Remarks Image options are only available if the question has "Allow Remarks" enabled (see RB2-FR9)
+- Remarks and Remarks Image options are only available if the question has "Allow Remarks" enabled (see RB2-FR8)
 
 **Switching to block**
 - From the inline 3-dot menu, the creator can switch the variable to block display (see RB2-FR4)
@@ -323,7 +322,7 @@ Every question variable block follows this structure:
 └──────────────────────────────────────────────┘
 ```
 
-The remarks + image section only appears when "Allow Remarks" is enabled on the question (see RB2-FR9).
+The remarks + image section only appears when "Allow Remarks" is enabled on the question (see RB2-FR8).
 
 ### Answer Area by Question Type
 
@@ -428,24 +427,33 @@ Support compound variables with named sub-questions. Multi-field variables group
 ## [RB2-FR7] Multi-Field + Multi-Response Table View
 
 ### Purpose
-When a variable has both Multi Field and Multi Response active, render it as a table where columns are sub-fields and rows are response instances.
+When a variable has both Multi Field and Multi Response active, render it as a table where columns are sub-fields and rows are response instances. Creators can control column header labels, relative widths, and display order directly in the editor.
 
 ### Expected Behaviour
 
 **Table structure**
 - Columns correspond to visible sub-fields in the configured order
 - Rows correspond to response instances
-- Column headers show the sub-field label (renameable — see RB2-FR8)
+- Column headers show the sub-field label (renameable inline)
+- Always full width
 
 **Sub-field with Multi Response inside a table**
 - A sub-field with Multi Response enabled renders its cell as a bulleted list of values
 
-**Always full width**
+**Column header editing**
+- Clicking a column header opens an inline text input
+- The header can be renamed independently of the underlying sub-field label
+
+**Column width resizing**
+- A resize handle sits on the right border of each column header except the last
+- Dragging resizes only the two adjacent columns; all others remain unchanged
+- Each column has a minimum width; the last column has no handle
+- Widths are stored proportionally so the table fills the available width at any screen or page size
 
 **In preview and export**
 - Table renders with actual answer data, respecting configured column order, headers, and widths
 
-### Multi-Field + Multi-Response Table Layout
+### Table Layout
 
 ```
 ┌────────────────────────────────────────────────────────────┐
@@ -461,34 +469,9 @@ When a variable has both Multi Field and Multi Response active, render it as a t
 └────────────────────────────────────────────────────────────┘
 ```
 
-- Resize handles on column borders (not last column)
-- Click header to rename; always full width
-
 ---
 
-## [RB2-FR8] Table Column Management
-
-### Purpose
-Give creators control over column header labels, relative widths, and display order in multi-field + multi-response tables.
-
-### Expected Behaviour
-
-**Column header editing**
-- Clicking a column header opens an inline text input
-- The header can be renamed independently of the underlying sub-field label
-
-**Column width resizing**
-- A resize handle sits on the right border of each column header except the last
-- Dragging the handle resizes only the two adjacent columns; all others remain unchanged
-- Each column has a minimum width
-- The last column has no handle; the table always fills full page width
-
-**Proportional widths**
-- Widths are stored proportionally so the table fills the available width at any screen or page size
-
----
-
-## [RB2-FR9] Remarks & Image Support
+## [RB2-FR8] Remarks & Image Support
 
 ### Purpose
 Allow solution creators to mark individual form questions as supporting remarks, so that respondents can attach a text note and up to one image as evidence alongside their answer. The report template can then display these remarks as block sections or as inline references.
@@ -538,7 +521,7 @@ Allow solution creators to mark individual form questions as supporting remarks,
 
 ---
 
-## [RB2-FR10] Approval Variable Blocks
+## [RB2-FR9] Approval Variable Blocks
 
 ### Purpose
 Render approval decisions (approved or rejected) as structured blocks with a fixed layout that shows all relevant approval metadata.
@@ -595,7 +578,7 @@ Render approval decisions (approved or rejected) as structured blocks with a fix
 ---
 
 
-## [RB2-FR11] Block Handle (Add & Drag)
+## [RB2-FR10] Block Handle (Add & Drag)
 
 ### Purpose
 Give creators a way to add new blocks adjacent to any existing block and to reorder blocks by dragging, without using the keyboard.
@@ -637,7 +620,7 @@ Give creators a way to add new blocks adjacent to any existing block and to reor
 
 ---
 
-## [RB2-FR12] Pageless / A4 Page Mode
+## [RB2-FR11] Pageless / A4 Page Mode
 
 ### Purpose
 Let creators choose between a pageless scrolling canvas and a paginated A4 canvas.
@@ -661,7 +644,7 @@ Let creators choose between a pageless scrolling canvas and a paginated A4 canva
 
 ---
 
-## [RB2-FR13] Report Preview
+## [RB2-FR12] Report Preview
 
 ### Purpose
 Let creators see how the report looks with sample data before exporting.
@@ -676,7 +659,7 @@ Let creators see how the report looks with sample data before exporting.
 
 ---
 
-## [RB2-FR14] Report Export (PDF)
+## [RB2-FR13] Report Export (PDF)
 
 ### Purpose
 Let creators export the rendered report as a PDF.
@@ -691,7 +674,7 @@ Let creators export the rendered report as a PDF.
 
 ---
 
-## [RB2-FR15] Template Persistence (Save / Load JSON)
+## [RB2-FR14] Template Persistence (Save / Load JSON)
 
 ### Purpose
 Allow report templates to be saved and restored.
