@@ -708,11 +708,6 @@ export function VariableBlockView({ node, editor, getPos, deleteNode, updateAttr
     bodyContent = <BlockPlaceholder type={questionType} />;
   }
 
-  const modeBadge = (isMultiField || isMultiResponse) ? (
-    <span className="ml-1.5 text-[9px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 border border-gray-200 font-medium flex-shrink-0">
-      {isMultiField ? "multi-field" : "multi-response"}
-    </span>
-  ) : null;
 
   return (
     <NodeViewWrapper as="div" data-question-block="true" contentEditable={false}>
@@ -726,7 +721,6 @@ export function VariableBlockView({ node, editor, getPos, deleteNode, updateAttr
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center min-w-0 flex-1">
               <span className="text-sm font-semibold text-gray-800 leading-snug truncate" title={label}>{label}</span>
-              {modeBadge}
             </div>
 
             <div className="relative flex-shrink-0" ref={menuRef}>
