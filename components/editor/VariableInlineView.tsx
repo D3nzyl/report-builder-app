@@ -5,6 +5,7 @@ import type { NodeViewProps } from "@tiptap/react";
 import { useState, useRef, useEffect } from "react";
 import { MoreHorizontal, Trash2, AlignJustify, Type, MessageSquare, ImageIcon } from "lucide-react";
 import { useQuestions } from "@/lib/questionContext";
+import { createPortal } from "react-dom";
 
 export function VariableInlineView({ node, editor, getPos, deleteNode, updateAttributes }: NodeViewProps) {
   const { label, variableKey, questionType, questionId, displayType } = node.attrs as {
@@ -22,6 +23,7 @@ export function VariableInlineView({ node, editor, getPos, deleteNode, updateAtt
   const [menuOpen, setMenuOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [isInSelection, setIsInSelection] = useState(false);
+  const [chipRect, setChipRect] = useState<DOMRect | null>(null);
   const menuRef = useRef<HTMLSpanElement>(null);
   const chipRef = useRef<HTMLSpanElement>(null);
 
@@ -102,7 +104,6 @@ export function VariableInlineView({ node, editor, getPos, deleteNode, updateAtt
       */}
       <span
         ref={chipRef}
-        title={label}
         className="relative inline-flex items-center select-none cursor-default leading-snug"
         style={{
           fontSize: "inherit",
@@ -113,8 +114,8 @@ export function VariableInlineView({ node, editor, getPos, deleteNode, updateAtt
           color: chipColor,
           maxWidth: "14rem",
         }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => { if (!menuOpen) setHovered(false); }}
+        onMouseEnter={() => { setHovered(true); setChipRect(chipRef.current?.getBoundingClientRect() ?? null); }}
+        onMouseLeave={() => { if (!menuOpen) { setHovered(false); setChipRect(null); } }}
       >
         <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: "1 1 0", minWidth: 0 }}>
           {label}
@@ -198,6 +199,32 @@ export function VariableInlineView({ node, editor, getPos, deleteNode, updateAtt
           )}
         </span>
       </span>
+
+      {hovered && !menuOpen && chipRect && createPortal(
+        <div
+          style={{
+            position: "fixed",
+            top: chipRect.top - 8,
+            left: chipRect.left + chipRect.width / 2,
+            transform: "translate(-50%, -100%)",
+            zIndex: 9999,
+            pointerEvents: "none",
+          }}
+        >
+          <div className="bg-gray-900 text-white text-[11px] font-medium rounded-lg px-2.5 py-1.5 whitespace-nowrap shadow-xl leading-none">
+            {label}
+          </div>
+          <div
+            className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0"
+            style={{
+              borderLeft: "4px solid transparent",
+              borderRight: "4px solid transparent",
+              borderTop: "4px solid #111827",
+            }}
+          />
+        </div>,
+        document.body
+      )}
     </NodeViewWrapper>
   );
 }

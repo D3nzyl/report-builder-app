@@ -28,6 +28,7 @@ import { sampleAnswers, sampleQuestions } from "@/lib/sampleData";
 import { sampleCollections, executeQuery } from "@/lib/collectionData";
 import type { Collection } from "@/lib/types";
 import { QuestionsContext } from "@/lib/questionContext";
+import { Tooltip } from "@/components/ui/Tooltip";
 import type { JSONContent, Editor } from "@tiptap/core";
 import type { FormQuestion, FormAnswers, QuestionType, SubField } from "@/lib/types";
 import {
@@ -328,7 +329,6 @@ function AtMentionMenu({
               <button
                 key={q.id}
                 ref={i === selected ? selectedRef : null}
-                title={q.label}
                 className={`flex items-center gap-2.5 w-full px-3 py-2 text-left transition-colors ${
                   i === selected ? "bg-blue-50" : "hover:bg-gray-50"
                 }`}
@@ -340,9 +340,11 @@ function AtMentionMenu({
                   {q.type === "approval" ? <Check size={11} /> : typeIcons[q.type]}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <div className={`text-sm font-medium leading-tight truncate ${
-                    i === selected ? "text-blue-700" : "text-gray-800"
-                  }`}>{q.label}</div>
+                  <Tooltip text={q.label}>
+                    <div className={`text-sm font-medium leading-tight truncate ${
+                      i === selected ? "text-blue-700" : "text-gray-800"
+                    }`}>{q.label}</div>
+                  </Tooltip>
                 </span>
               </button>
             ))
