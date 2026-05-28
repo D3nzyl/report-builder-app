@@ -79,12 +79,12 @@ function PhoneFrame({ html, onClose, onDownload }: { html: string; onClose: () =
     <div
       className="relative flex flex-col flex-shrink-0"
       style={{
-        width: 390,
+        width: 320,
         height: "75vh",
-        maxHeight: 780,
+        maxHeight: 700,
         background: "#fff",
-        borderRadius: 44,
-        boxShadow: "0 0 0 10px #1a1a1a, 0 30px 80px rgba(0,0,0,0.5)",
+        borderRadius: 40,
+        boxShadow: "0 0 0 9px #1a1a1a, 0 30px 80px rgba(0,0,0,0.5)",
         overflow: "hidden",
       }}
     >
@@ -93,7 +93,7 @@ function PhoneFrame({ html, onClose, onDownload }: { html: string; onClose: () =
         <span style={{ fontSize: 12, fontWeight: 600, color: "#111" }}>9:41</span>
         <div style={{
           position: "absolute", left: "50%", transform: "translateX(-50%)",
-          width: 120, height: 34, background: "#1a1a1a",
+          width: 100, height: 30, background: "#1a1a1a",
           borderRadius: "0 0 20px 20px", top: 0,
         }} />
         <div className="flex items-center gap-1">
