@@ -24,11 +24,17 @@ export const sampleQuestions: FormQuestion[] = [
   { id: "ex_workflow",     label: "Workflow Title",     variableKey: "ex_workflow",     type: "short_text", category: "execution", system: true },
   { id: "ex_status",       label: "Execution Status",   variableKey: "ex_status",       type: "single_select", category: "execution", system: true },
 
-  // ─── Form-level metadata ───────────────────────────────────────────────────
-  { id: "form_started_by",   label: "Form Started By",   variableKey: "form_started_by",   type: "short_text", category: "form", system: true },
-  { id: "form_submitted_by", label: "Form Submitted By", variableKey: "form_submitted_by", type: "short_text", category: "form", system: true },
-  { id: "form_started_at",   label: "Form Started At",   variableKey: "form_started_at",   type: "datetime",   category: "form", system: true },
-  { id: "form_submitted_at", label: "Form Submitted At", variableKey: "form_submitted_at", type: "datetime",   category: "form", system: true },
+  // ─── Form block metadata (per form node in the workflow) ──────────────────
+  // Site Inspection Form
+  { id: "f1_started_by",   label: "Site Inspection Form — Started By",   variableKey: "f1_started_by",   type: "short_text", category: "form", system: true },
+  { id: "f1_submitted_by", label: "Site Inspection Form — Submitted By", variableKey: "f1_submitted_by", type: "short_text", category: "form", system: true },
+  { id: "f1_started_at",   label: "Site Inspection Form — Started At",   variableKey: "f1_started_at",   type: "datetime",   category: "form", system: true },
+  { id: "f1_submitted_at", label: "Site Inspection Form — Submitted At", variableKey: "f1_submitted_at", type: "datetime",   category: "form", system: true },
+  // Safety Check Form
+  { id: "f2_started_by",   label: "Safety Check Form — Started By",   variableKey: "f2_started_by",   type: "short_text", category: "form", system: true },
+  { id: "f2_submitted_by", label: "Safety Check Form — Submitted By", variableKey: "f2_submitted_by", type: "short_text", category: "form", system: true },
+  { id: "f2_started_at",   label: "Safety Check Form — Started At",   variableKey: "f2_started_at",   type: "datetime",   category: "form", system: true },
+  { id: "f2_submitted_at", label: "Safety Check Form — Submitted At", variableKey: "f2_submitted_at", type: "datetime",   category: "form", system: true },
 
   // ─── Form questions ────────────────────────────────────────────────────────
   { id: "q_project_name",       label: "Project Name",         variableKey: "project_name",       type: "short_text" },
@@ -75,11 +81,15 @@ export const sampleAnswers: FormAnswers = {
   ex_project:      "Gim Tian Construction Phase 2",
   ex_workflow:     "Daily Site Inspection",
   ex_status:       "In Progress",
-  // Form metadata
-  form_started_by:   "Ahmad bin Ismail",
-  form_submitted_by: "Ahmad bin Ismail",
-  form_started_at:   "22 May 2026 09:00",
-  form_submitted_at: "22 May 2026 10:15",
+  // Form block metadata
+  f1_started_by:   "Ahmad bin Ismail",
+  f1_submitted_by: "Ahmad bin Ismail",
+  f1_started_at:   "22 May 2026 09:00",
+  f1_submitted_at: "22 May 2026 10:15",
+  f2_started_by:   "Raj Kumar",
+  f2_submitted_by: "Raj Kumar",
+  f2_started_at:   "22 May 2026 10:30",
+  f2_submitted_at: "22 May 2026 11:00",
   // Form answers
   project_name:    "Gim Tian Site A",
   long_name:       "Ahmad bin Ismail",
