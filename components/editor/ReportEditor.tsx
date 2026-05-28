@@ -52,69 +52,107 @@ const OVERFLOW_TRIGGER = A4_H - 28;
 const INITIAL_CONTENT: JSONContent = {
   type: "doc",
   content: [
+    // ── Title ──────────────────────────────────────────────────────────────────
     {
       type: "heading",
       attrs: { level: 1 },
       content: [{ type: "text", text: "Inspection Report" }],
     },
+
+    // ── Overview ───────────────────────────────────────────────────────────────
+    {
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Overview" }],
+    },
     {
       type: "paragraph",
       content: [
         { type: "text", text: "This inspection was conducted at " },
-        {
-          type: "questionVariableInline",
-          attrs: {
-            questionId: "q_project_name",
-            variableKey: "project_name",
-            label: "Project Name",
-            questionType: "short_text",
-            displayType: "inline_value",
-          },
-        },
+        { type: "questionVariableInline", attrs: { questionId: "q_project_name", variableKey: "project_name", label: "Project Name", questionType: "short_text", displayType: "inline_value" } },
         { type: "text", text: " on " },
-        {
-          type: "questionVariableInline",
-          attrs: {
-            questionId: "q_inspection_date",
-            variableKey: "inspection_date",
-            label: "Inspection Date",
-            questionType: "date",
-            displayType: "inline_value",
-          },
-        },
-        { type: "text", text: "." },
+        { type: "questionVariableInline", attrs: { questionId: "q_inspection_date", variableKey: "inspection_date", label: "Inspection Date", questionType: "date", displayType: "inline_value" } },
+        { type: "text", text: " at " },
+        { type: "questionVariableInline", attrs: { questionId: "q_inspection_time", variableKey: "inspection_time", label: "Inspection Date & Time", questionType: "datetime", displayType: "inline_value" } },
+        { type: "text", text: ". The site representative on duty was " },
+        { type: "questionVariableInline", attrs: { questionId: "q_long_name", variableKey: "long_name", label: "Primary Contractor Representative On-Site Name", questionType: "short_text", displayType: "inline_value" } },
+        { type: "text", text: ". Work type: " },
+        { type: "questionVariableInline", attrs: { questionId: "q_work_type", variableKey: "work_type", label: "Work Type", questionType: "single_select", displayType: "inline_value" } },
+        { type: "text", text: ". Overall completion: " },
+        { type: "questionVariableInline", attrs: { questionId: "q_completion_pct", variableKey: "completion_pct", label: "Completion %", questionType: "slider", displayType: "inline_value" } },
+        { type: "text", text: "%." },
       ],
     },
+
+    // ── Site Details ───────────────────────────────────────────────────────────
     {
-      type: "questionVariableBlock",
-      attrs: {
-        questionId: "q_safety_remarks",
-        variableKey: "safety_remarks",
-        label: "Safety Remarks",
-        questionType: "long_text",
-        displayType: "question_answer_block",
-      },
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Site Details" }],
     },
+    { type: "questionVariableBlock", attrs: { questionId: "q_site_location", variableKey: "site_location", label: "Site Location", questionType: "location", displayType: "question_answer_block", colSpan: 12 } },
+    { type: "questionVariableBlock", attrs: { questionId: "q_site_rating", variableKey: "site_rating", label: "Site Rating", questionType: "rating", displayType: "question_answer_block", colSpan: 4 } },
+    { type: "questionVariableBlock", attrs: { questionId: "q_risk_level", variableKey: "risk_level", label: "Risk Level", questionType: "radio", displayType: "question_answer_block", colSpan: 4 } },
+    { type: "questionVariableBlock", attrs: { questionId: "q_worker_count", variableKey: "worker_count", label: "Worker Count", questionType: "number", displayType: "question_answer_block", colSpan: 4 } },
+
+    // ── PPE & Compliance ───────────────────────────────────────────────────────
     {
-      type: "questionVariableBlock",
-      attrs: {
-        questionId: "q_ppe_items",
-        variableKey: "ppe_items",
-        label: "PPE Items Observed",
-        questionType: "multi_select",
-        displayType: "question_answer_block",
-      },
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "PPE & Compliance" }],
     },
+    { type: "questionVariableBlock", attrs: { questionId: "q_ppe_compliant", variableKey: "ppe_compliant", label: "PPE Compliant", questionType: "toggle", displayType: "question_answer_block", colSpan: 4 } },
+    { type: "questionVariableBlock", attrs: { questionId: "q_ppe_items", variableKey: "ppe_items", label: "PPE Items Observed", questionType: "multi_select", displayType: "question_answer_block", colSpan: 8 } },
+
+    // ── Safety Remarks ─────────────────────────────────────────────────────────
     {
-      type: "questionVariableBlock",
-      attrs: {
-        questionId: "q_photo_evidence",
-        variableKey: "photo_evidence",
-        label: "Photo Evidence",
-        questionType: "image_upload",
-        displayType: "question_answer_block",
-      },
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Safety Remarks" }],
     },
+    { type: "questionVariableBlock", attrs: { questionId: "q_safety_remarks", variableKey: "safety_remarks", label: "Safety Remarks", questionType: "long_text", displayType: "question_answer_block", colSpan: 12 } },
+
+    // ── Photo Evidence ─────────────────────────────────────────────────────────
+    {
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Photo Evidence" }],
+    },
+    { type: "questionVariableBlock", attrs: { questionId: "q_photo_evidence", variableKey: "photo_evidence", label: "Photo Evidence", questionType: "image_upload", displayType: "question_answer_block", colSpan: 12 } },
+
+    // ── Attendance ─────────────────────────────────────────────────────────────
+    {
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Attendance Register" }],
+    },
+    { type: "questionVariableBlock", attrs: { questionId: "q_attendance", variableKey: "attendance", label: "Attendance", questionType: "short_text", displayType: "question_answer_block", colSpan: 12 } },
+
+    // ── Site Sketch ────────────────────────────────────────────────────────────
+    {
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Site Sketch" }],
+    },
+    { type: "questionVariableBlock", attrs: { questionId: "q_site_sketch", variableKey: "site_sketch", label: "Site Sketch", questionType: "sketch", displayType: "question_answer_block", colSpan: 8 } },
+
+    // ── Documents & Sign-off ───────────────────────────────────────────────────
+    {
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Documents & Sign-off" }],
+    },
+    { type: "questionVariableBlock", attrs: { questionId: "q_report_file", variableKey: "report_file", label: "Report File", questionType: "file_upload", displayType: "question_answer_block", colSpan: 6 } },
+    { type: "questionVariableBlock", attrs: { questionId: "q_supervisor_sig", variableKey: "supervisor_sig", label: "Supervisor Signature", questionType: "signature", displayType: "question_answer_block", colSpan: 6 } },
+
+    // ── Approvals ──────────────────────────────────────────────────────────────
+    {
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Approvals" }],
+    },
+    { type: "questionVariableBlock", attrs: { questionId: "q_ptw_approval", variableKey: "ptw_approval", label: "Permit to Work Approval", questionType: "approval", displayType: "question_answer_block", colSpan: 12 } },
+    { type: "questionVariableBlock", attrs: { questionId: "q_supervisor_approval", variableKey: "supervisor_approval", label: "Supervisor Approval", questionType: "approval", displayType: "question_answer_block", colSpan: 12 } },
   ],
 };
 
