@@ -316,9 +316,6 @@ function AtMentionMenu({
                     }`}>{q.label}</div>
                   </Tooltip>
                 </span>
-                {q.system && (
-                  <span className="flex-shrink-0 text-[9px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-400 border border-gray-200 font-medium">sys</span>
-                )}
               </button>
             );
           })
@@ -751,6 +748,7 @@ function VariableTray({
         <div>
           <h2 className="font-semibold text-xs text-gray-800">Variables</h2>
           <p className="text-[10px] text-gray-400 mt-0.5">@ to insert · click value to edit</p>
+          <p className="text-[10px] text-amber-500 mt-0.5">Prototype only — not part of the final product</p>
         </div>
         <button
           onClick={onCollapse}
@@ -1317,7 +1315,7 @@ export function ReportEditor() {
   const [collections] = useState<Collection[]>(sampleCollections);
   const [pendingBlockInsert, setPendingBlockInsert] = useState<PendingBlockInsert | null>(null);
   const [pageMode, setPageMode] = useState<"pageless" | "page">("pageless");
-  const [trayCollapsed, setTrayCollapsed] = useState(false);
+  const [trayCollapsed, setTrayCollapsed] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   // Multi-page state (used in page mode)
