@@ -231,19 +231,17 @@ const SLASH_ITEMS: SlashItem[] = [
 ];
 
 // ─── @ Mention Menu ──────────────────────────────────────────────────────────
-type AtTab = "form" | "approval" | "collections";
+type AtTab = "form" | "approval" | "execution";
 
 function AtMentionMenu({
-  questions, collections, query, selected, activeTab, onTabChange, onSelect, onSelectCollection, top, left, flipUp,
+  questions, query, selected, activeTab, onTabChange, onSelect, top, left, flipUp,
 }: {
   questions: FormQuestion[];
-  collections: Collection[];
   query: string;
   selected: number;
   activeTab: AtTab;
   onTabChange: (tab: AtTab) => void;
   onSelect: (q: FormQuestion) => void;
-  onSelectCollection: (c: Collection, mode: "table" | "cards") => void;
   top: number;
   left: number;
   flipUp: boolean;
@@ -262,17 +260,10 @@ function AtMentionMenu({
       || q.variableKey.toLowerCase().includes(query.toLowerCase());
   });
 
-  const filteredCollections = collections.filter(c => {
-    if (activeTab !== "collections") return false;
-    if (!query) return true;
-    return c.name.toLowerCase().includes(query.toLowerCase())
-      || c.variableKey.toLowerCase().includes(query.toLowerCase());
-  });
-
   const tabs: { key: AtTab; label: string }[] = [
     { key: "form", label: "Form" },
     { key: "approval", label: "Approval" },
-    { key: "collections", label: "Collections" },
+    { key: "execution", label: "Execution" },
   ];
 
   return (
@@ -296,98 +287,41 @@ function AtMentionMenu({
         ))}
       </div>
       <div className="py-1 max-h-60 overflow-y-auto">
-        {activeTab === "collections" ? (
-          filteredCollections.length === 0 ? (
-            <div className="px-4 py-3 text-xs text-gray-400 text-center">No matching collections</div>
-          ) : (
-            filteredCollections.map((c, i) => (
-              <div
-                key={c.id}
-                ref={i === selected ? (selectedRef as React.Ref<HTMLDivElement>) : null}
-                className={`flex items-center gap-2 w-full px-3 py-2 transition-colors ${
-                  i === selected ? "bg-violet-50" : "hover:bg-gray-50"
-                }`}
-              >
-                {/* Main area → insert as table */}
-                <button
-                  className="flex items-center gap-2 flex-1 min-w-0 text-left"
-                  onMouseDown={e => { e.preventDefault(); onSelectCollection(c, "table"); }}
-                >
-                  <span className={`flex items-center justify-center w-6 h-6 rounded flex-shrink-0 ${
-                    i === selected ? "bg-violet-100 text-violet-600" : "bg-gray-100 text-gray-500"
-                  }`}>
-                    <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-                      <rect x="0.5" y="0.5" width="10" height="10" rx="1.5" stroke="currentColor" strokeWidth="1"/>
-                      <line x1="0.5" y1="3.5" x2="10.5" y2="3.5" stroke="currentColor" strokeWidth="0.8"/>
-                      <line x1="3.5" y1="3.5" x2="3.5" y2="10.5" stroke="currentColor" strokeWidth="0.8"/>
-                    </svg>
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <div className={`text-sm font-medium leading-tight truncate ${
-                      i === selected ? "text-violet-700" : "text-gray-800"
-                    }`}>{c.name}</div>
-                    <div className="text-[10px] text-gray-400 font-mono truncate">{c.variableKey} · {c.columns.length} cols · {c.rows.length} rows</div>
-                  </span>
-                </button>
-
-                {/* Insert mode buttons */}
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  <button
-                    title="Insert as table"
-                    onMouseDown={e => { e.preventDefault(); onSelectCollection(c, "table"); }}
-                    className="flex items-center gap-1 px-1.5 py-1 rounded text-[10px] text-gray-400 hover:bg-violet-100 hover:text-violet-600 transition-colors"
-                  >
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                      <rect x="0.5" y="0.5" width="9" height="9" rx="1" stroke="currentColor" strokeWidth="0.9"/>
-                      <line x1="0.5" y1="3.5" x2="9.5" y2="3.5" stroke="currentColor" strokeWidth="0.8"/>
-                      <line x1="3.5" y1="3.5" x2="3.5" y2="9.5" stroke="currentColor" strokeWidth="0.8"/>
-                    </svg>
-                    Table
-                  </button>
-                  <button
-                    title="Insert as blocks — one per row"
-                    onMouseDown={e => { e.preventDefault(); onSelectCollection(c, "cards"); }}
-                    className="flex items-center gap-1 px-1.5 py-1 rounded text-[10px] text-gray-400 hover:bg-indigo-100 hover:text-indigo-600 transition-colors"
-                  >
-                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                      <rect x="0.5" y="0.5" width="9" height="2.2" rx="0.8" stroke="currentColor" strokeWidth="0.9"/>
-                      <rect x="0.5" y="3.9" width="9" height="2.2" rx="0.8" stroke="currentColor" strokeWidth="0.9"/>
-                      <rect x="0.5" y="7.3" width="9" height="2.2" rx="0.8" stroke="currentColor" strokeWidth="0.9"/>
-                    </svg>
-                    Blocks
-                  </button>
-                </div>
-              </div>
-            ))
-          )
+        {filteredQuestions.length === 0 ? (
+          <div className="px-4 py-3 text-xs text-gray-400 text-center">No matching variables</div>
         ) : (
-          filteredQuestions.length === 0 ? (
-            <div className="px-4 py-3 text-xs text-gray-400 text-center">No matching variables</div>
-          ) : (
-            filteredQuestions.map((q, i) => (
+          filteredQuestions.map((q, i) => {
+            const isExecution = q.category === "execution";
+            const selectedBg = isExecution ? "bg-orange-50" : "bg-blue-50";
+            const selectedText = isExecution ? "text-orange-700" : "text-blue-700";
+            const iconBg = i === selected
+              ? (isExecution ? "bg-orange-100 text-orange-600" : "bg-blue-100 text-blue-600")
+              : "bg-gray-100 text-gray-500";
+            return (
               <button
                 key={q.id}
                 ref={i === selected ? selectedRef : null}
                 className={`flex items-center gap-2.5 w-full px-3 py-2 text-left transition-colors ${
-                  i === selected ? "bg-blue-50" : "hover:bg-gray-50"
+                  i === selected ? selectedBg : "hover:bg-gray-50"
                 }`}
                 onMouseDown={e => { e.preventDefault(); onSelect(q); }}
               >
-                <span className={`flex items-center justify-center w-6 h-6 rounded flex-shrink-0 text-gray-500 ${
-                  i === selected ? "bg-blue-100 text-blue-600" : "bg-gray-100"
-                }`}>
+                <span className={`flex items-center justify-center w-6 h-6 rounded flex-shrink-0 ${iconBg}`}>
                   {q.type === "approval" ? <Check size={11} /> : typeIcons[q.type]}
                 </span>
                 <span className="min-w-0 flex-1">
                   <Tooltip text={q.label}>
                     <div className={`text-sm font-medium leading-tight truncate ${
-                      i === selected ? "text-blue-700" : "text-gray-800"
+                      i === selected ? selectedText : "text-gray-800"
                     }`}>{q.label}</div>
                   </Tooltip>
                 </span>
+                {q.system && (
+                  <span className="flex-shrink-0 text-[9px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-400 border border-gray-200 font-medium">sys</span>
+                )}
               </button>
-            ))
-          )
+            );
+          })
         )}
       </div>
     </div>
@@ -1147,30 +1081,6 @@ function SinglePageEditor({
       const tab = atTabRef.current;
       const query = atMenuRef.current?.query ?? "";
 
-      if (tab === "collections") {
-        const filtered = collections.filter(c =>
-          !query || c.name.toLowerCase().includes(query.toLowerCase())
-            || c.variableKey.toLowerCase().includes(query.toLowerCase())
-        );
-        if (e.key === "Escape") { e.preventDefault(); setAtMenu(null); }
-        else if (e.key === "ArrowDown") { e.preventDefault(); setAtSelected(s => filtered.length > 0 ? (s + 1) % filtered.length : 0); }
-        else if (e.key === "ArrowUp") { e.preventDefault(); setAtSelected(s => filtered.length > 0 ? (s - 1 + filtered.length) % filtered.length : 0); }
-        else if (e.key === "Enter") {
-          e.preventDefault();
-          const c = filtered[atSelected] ?? filtered[0];
-          if (c && atMenuRef.current) {
-            const { from, to } = atMenuRef.current;
-            setAtMenu(null);
-            editor?.chain().focus().deleteRange({ from, to })
-              .insertCollectionBlock({
-                collectionId: c.id, collectionKey: c.variableKey,
-                label: c.name, sqlQuery: `SELECT * FROM ${c.variableKey}`,
-              }).run(); // keyboard Enter defaults to table mode
-          }
-        }
-        return;
-      }
-
       const filtered = questions.filter(q => {
         const cat = q.category ?? "form";
         if (cat !== tab) return false;
@@ -1248,13 +1158,11 @@ function SinglePageEditor({
       {atMenu && (
         <AtMentionMenu
           questions={questions}
-          collections={collections}
           query={atMenu.query}
           selected={atSelected}
           activeTab={atTab}
           onTabChange={tab => { setAtTab(tab); setAtSelected(0); }}
           onSelect={executeAtItem}
-          onSelectCollection={executeCollectionItem}
           top={atMenu.top}
           left={atMenu.left}
           flipUp={atMenu.flipUp}
@@ -1700,30 +1608,6 @@ export function ReportEditor() {
       const tab = atTabRef.current;
       const query = atMenuRef.current?.query ?? "";
 
-      if (tab === "collections") {
-        const filtered = collections.filter(c =>
-          !query || c.name.toLowerCase().includes(query.toLowerCase())
-            || c.variableKey.toLowerCase().includes(query.toLowerCase())
-        );
-        if (e.key === "Escape") { e.preventDefault(); setAtMenu(null); }
-        else if (e.key === "ArrowDown") { e.preventDefault(); setAtSelected(s => filtered.length > 0 ? (s + 1) % filtered.length : 0); }
-        else if (e.key === "ArrowUp") { e.preventDefault(); setAtSelected(s => filtered.length > 0 ? (s - 1 + filtered.length) % filtered.length : 0); }
-        else if (e.key === "Enter") {
-          e.preventDefault();
-          const c = filtered[atSelected] ?? filtered[0];
-          if (c && atMenuRef.current) {
-            const { from, to } = atMenuRef.current;
-            setAtMenu(null);
-            editor?.chain().focus().deleteRange({ from, to })
-              .insertCollectionBlock({
-                collectionId: c.id, collectionKey: c.variableKey,
-                label: c.name, sqlQuery: `SELECT * FROM ${c.variableKey}`,
-              }).run(); // keyboard Enter defaults to table mode
-          }
-        }
-        return;
-      }
-
       const filtered = questions.filter(q => {
         const cat = q.category ?? "form";
         if (cat !== tab) return false;
@@ -1970,13 +1854,11 @@ export function ReportEditor() {
         {pageMode === "pageless" && atMenu && (
           <AtMentionMenu
             questions={questions}
-            collections={collections}
             query={atMenu.query}
             selected={atSelected}
             activeTab={atTab}
             onTabChange={tab => { setAtTab(tab); setAtSelected(0); }}
             onSelect={executeAtItem}
-            onSelectCollection={executeCollectionItem}
             top={atMenu.top}
             left={atMenu.left}
             flipUp={atMenu.flipUp}

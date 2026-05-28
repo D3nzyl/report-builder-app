@@ -16,6 +16,21 @@ const rejectedSample: ApprovalAnswer = {
 };
 
 export const sampleQuestions: FormQuestion[] = [
+  // ─── Execution-level metadata ──────────────────────────────────────────────
+  { id: "ex_id",           label: "Execution ID",       variableKey: "ex_id",           type: "short_text", category: "execution", system: true },
+  { id: "ex_started_by",   label: "Started By",         variableKey: "ex_started_by",   type: "short_text", category: "execution", system: true },
+  { id: "ex_started_at",   label: "Started At",         variableKey: "ex_started_at",   type: "datetime",   category: "execution", system: true },
+  { id: "ex_project",      label: "Project",            variableKey: "ex_project",      type: "short_text", category: "execution", system: true },
+  { id: "ex_workflow",     label: "Workflow Title",     variableKey: "ex_workflow",     type: "short_text", category: "execution", system: true },
+  { id: "ex_status",       label: "Execution Status",   variableKey: "ex_status",       type: "single_select", category: "execution", system: true },
+
+  // ─── Form-level metadata ───────────────────────────────────────────────────
+  { id: "form_started_by",   label: "Form Started By",   variableKey: "form_started_by",   type: "short_text", category: "form", system: true },
+  { id: "form_submitted_by", label: "Form Submitted By", variableKey: "form_submitted_by", type: "short_text", category: "form", system: true },
+  { id: "form_started_at",   label: "Form Started At",   variableKey: "form_started_at",   type: "datetime",   category: "form", system: true },
+  { id: "form_submitted_at", label: "Form Submitted At", variableKey: "form_submitted_at", type: "datetime",   category: "form", system: true },
+
+  // ─── Form questions ────────────────────────────────────────────────────────
   { id: "q_project_name",       label: "Project Name",         variableKey: "project_name",       type: "short_text" },
   { id: "q_long_name",          label: "Primary Contractor Representative On-Site Name", variableKey: "long_name", type: "short_text" },
   { id: "q_safety_remarks",     label: "Safety Remarks",       variableKey: "safety_remarks",     type: "long_text" },
@@ -53,6 +68,19 @@ export const sampleQuestions: FormQuestion[] = [
 ];
 
 export const sampleAnswers: FormAnswers = {
+  // Execution metadata
+  ex_id:           "EX-2026-05-001",
+  ex_started_by:   "Denzyl Chua",
+  ex_started_at:   "22 May 2026 08:00",
+  ex_project:      "Gim Tian Construction Phase 2",
+  ex_workflow:     "Daily Site Inspection",
+  ex_status:       "In Progress",
+  // Form metadata
+  form_started_by:   "Ahmad bin Ismail",
+  form_submitted_by: "Ahmad bin Ismail",
+  form_started_at:   "22 May 2026 09:00",
+  form_submitted_at: "22 May 2026 10:15",
+  // Form answers
   project_name:    "Gim Tian Site A",
   long_name:       "Ahmad bin Ismail",
   safety_remarks:  "All workers were wearing PPE during the inspection.",

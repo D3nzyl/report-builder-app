@@ -17,7 +17,7 @@ export type QuestionType =
   | "image_upload"
   | "approval";
 
-export type VariableCategory = "form" | "approval";
+export type VariableCategory = "form" | "approval" | "execution";
 
 export interface ApprovalAnswer {
   decision: "approved" | "rejected";
@@ -45,6 +45,7 @@ export interface FormQuestion {
   type: QuestionType;
   alias?: string;
   category?: VariableCategory; // default "form"
+  system?: boolean;            // system-generated metadata, not a user question
   multiResponse?: boolean;
   multiField?: boolean;
   subFields?: SubField[];
