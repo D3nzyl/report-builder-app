@@ -40,6 +40,7 @@ import {
   Eye, FileDown, FileText, Loader2,
   Table as TableIcon, Code2, Pencil, Check, X, AlertCircle,
   Rows3, Columns, Plus, FileText as PageIcon, AlignLeft,
+  Save, FolderOpen, RotateCcw, Download,
 } from "lucide-react";
 
 // ─── A4 constants ─────────────────────────────────────────────────────────────
@@ -1438,6 +1439,64 @@ export function ReportEditor() {
 
   useEffect(() => { setMounted(true); }, []);
 
+  const [savedFlash, setSavedFlash] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function getTemplateJson() {
+    const content = pageMode === "page" ? combinePageContents() : editor?.getJSON();
+    return { version: 1, content, questions, answers, pageMode };
+  }
+
+  function handleSave() {
+    localStorage.setItem("rb2_template", JSON.stringify(getTemplateJson()));
+    setSavedFlash(true);
+    setTimeout(() => setSavedFlash(false), 2000);
+  }
+
+  function handleDownloadJson() {
+    const blob = new Blob([JSON.stringify(getTemplateJson(), null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "report-template.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function handleLoad(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target?.result as string);
+        if (!data.content) throw new Error("Invalid template");
+        if (data.questions) setQuestions(data.questions);
+        if (data.answers) setAnswers(data.answers);
+        const mode = data.pageMode ?? "pageless";
+        setPageMode(mode);
+        if (mode === "page") {
+          setPageContents([data.content]);
+        } else {
+          editor?.commands.setContent(data.content);
+        }
+      } catch {
+        alert("Could not load template — invalid or unsupported file.");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  }
+
+  function handleReset() {
+    if (!confirm("Reset to demo? All unsaved changes will be lost.")) return;
+    setQuestions(sampleQuestions);
+    setAnswers(sampleAnswers);
+    setPageMode("pageless");
+    setPageContents([INITIAL_CONTENT]);
+    editor?.commands.setContent(INITIAL_CONTENT);
+  }
+
   function handleAnswerChange(key: string, value: string | string[]) {
     setAnswers(prev => ({ ...prev, [key]: value }));
   }
@@ -1739,6 +1798,32 @@ export function ReportEditor() {
         {/* ── Header portal: mode toggle + action buttons ── */}
         {headerActionsEl && createPortal(
           <div className="flex items-center gap-2">
+
+            {/* Template actions */}
+            <div className="flex items-center gap-1">
+              <button onClick={handleSave} title="Save to browser"
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                  savedFlash ? "border-green-400 bg-green-50 text-green-700" : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                }`}>
+                <Save size={13} />{savedFlash ? "Saved!" : "Save"}
+              </button>
+              <button onClick={handleDownloadJson} title="Download as JSON"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-300 text-gray-700 text-xs font-medium hover:bg-gray-50 transition-colors">
+                <Download size={13} /> Export
+              </button>
+              <button onClick={() => fileInputRef.current?.click()} title="Load from JSON"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-300 text-gray-700 text-xs font-medium hover:bg-gray-50 transition-colors">
+                <FolderOpen size={13} /> Load
+              </button>
+              <button onClick={handleReset} title="Reset to demo"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-300 text-gray-500 text-xs font-medium hover:bg-gray-50 hover:text-gray-700 transition-colors">
+                <RotateCcw size={13} /> Reset
+              </button>
+            </div>
+
+            <div className="w-px h-5 bg-gray-200" />
+
+            {/* Page mode toggle */}
             <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
               <button
                 onClick={() => setPageMode("pageless")}
@@ -1760,6 +1845,9 @@ export function ReportEditor() {
               </button>
             </div>
 
+            <div className="w-px h-5 bg-gray-200" />
+
+            {/* Preview & export */}
             <button onClick={handlePreview}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-900 text-white text-xs font-medium hover:bg-gray-700 transition-colors">
               <Eye size={13} /> Preview
@@ -1772,6 +1860,9 @@ export function ReportEditor() {
           </div>,
           headerActionsEl,
         )}
+
+        {/* Hidden file input for Load */}
+        <input ref={fileInputRef} type="file" accept=".json,application/json" className="hidden" onChange={handleLoad} />
 
         <div className="flex flex-1 overflow-hidden">
           {/* ── Editor canvas ── */}
