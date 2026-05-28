@@ -17,6 +17,7 @@ const rejectedSample: ApprovalAnswer = {
 
 export const sampleQuestions: FormQuestion[] = [
   { id: "q_project_name",       label: "Project Name",         variableKey: "project_name",       type: "short_text" },
+  { id: "q_long_name",          label: "Primary Contractor Representative On-Site Name", variableKey: "long_name", type: "short_text" },
   { id: "q_safety_remarks",     label: "Safety Remarks",       variableKey: "safety_remarks",     type: "long_text" },
   { id: "q_worker_count",       label: "Worker Count",         variableKey: "worker_count",       type: "number" },
   { id: "q_risk_level",         label: "Risk Level",           variableKey: "risk_level",         type: "radio" },
@@ -53,6 +54,7 @@ export const sampleQuestions: FormQuestion[] = [
 
 export const sampleAnswers: FormAnswers = {
   project_name:    "Gim Tian Site A",
+  long_name:       "Ahmad bin Ismail",
   safety_remarks:  "All workers were wearing PPE during the inspection.",
   worker_count:    "12",
   risk_level:      "Medium",

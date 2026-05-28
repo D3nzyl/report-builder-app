@@ -328,6 +328,7 @@ function AtMentionMenu({
               <button
                 key={q.id}
                 ref={i === selected ? selectedRef : null}
+                title={q.label}
                 className={`flex items-center gap-2.5 w-full px-3 py-2 text-left transition-colors ${
                   i === selected ? "bg-blue-50" : "hover:bg-gray-50"
                 }`}

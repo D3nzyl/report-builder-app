@@ -92,16 +92,6 @@ The following question types are supported across the form variable system. Each
 **Approval** *(special type — see RB2-FR10)*
 - approval — a structured approval decision (approved or rejected) with person, date, signature or remarks, and optional images
 
-### Exclusions
-
-- Detailed form builder configuration (covered by Form Builder PRD)
-- Workflow execution engine and runtime data fetching
-- Multi-template versioning and approval flows
-- Role-based template access control beyond workflow-level permissions
-- Conditional sections (show/hide based on answer values)
-- Image annotation or sketch rendering in the generated report
-- Collections and SQL data blocks
-- Variable tray / sidebar (prototype-only demo, not a shipped feature)
 
 ---
 
@@ -722,3 +712,15 @@ Allow report templates to be saved and restored.
 **Integration**
 - When accessed from Workflow Builder V2.0 (WB2-FR9), templates save against the workflow
 - Standalone save/load remains available for testing
+---
+
+## Exclusions
+
+- Detailed form builder configuration (covered by Form Builder PRD)
+- Workflow execution engine and runtime data fetching
+- Multi-template versioning and approval flows
+- Role-based template access control beyond workflow-level permissions
+- Conditional sections (show/hide based on answer values)
+- Image annotation or sketch rendering in the generated report
+- Collections and SQL data blocks
+- Variable tray / sidebar (prototype-only demo, not a shipped feature)
