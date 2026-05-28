@@ -79,12 +79,12 @@ function PhoneFrame({ html, onClose, onDownload }: { html: string; onClose: () =
     <div
       className="relative flex flex-col flex-shrink-0"
       style={{
-        width: 320,
-        height: "75vh",
-        maxHeight: 700,
+        width: 300,
+        aspectRatio: "9 / 19.5",
+        maxHeight: "82vh",
         background: "#fff",
-        borderRadius: 40,
-        boxShadow: "0 0 0 9px #1a1a1a, 0 30px 80px rgba(0,0,0,0.5)",
+        borderRadius: 44,
+        boxShadow: "0 0 0 10px #1a1a1a, 0 0 0 11px #3a3a3a, 0 30px 80px rgba(0,0,0,0.5)",
         overflow: "hidden",
       }}
     >
