@@ -290,7 +290,7 @@ function multiFieldHtml(question: FormQuestion, answers: FormAnswers, label: str
 
 // ─── Block nodes → HTML ───────────────────────────────────────────────────────
 
-function blockToHtml(node: JSONContent, answers: FormAnswers, questions: FormQuestion[]): string {
+function blockToHtml(node: JSONContent, answers: FormAnswers, questions: FormQuestion[], pageless = false): string {
   switch (node.type) {
     case "heading": {
       const lvl = node.attrs?.level ?? 1;
@@ -310,7 +310,7 @@ function blockToHtml(node: JSONContent, answers: FormAnswers, questions: FormQue
 
     case "bulletList": {
       const items = (node.content ?? []).map(item => {
-        const body = (item.content ?? []).map(n => blockToHtml(n, answers, questions)).join("");
+        const body = (item.content ?? []).map(n => blockToHtml(n, answers, questions, pageless)).join("");
         return `<li style="margin-bottom:3px;">${body}</li>`;
       }).join("");
       return `<ul style="width:100%;box-sizing:border-box;margin:6px 0 6px 20px;padding:0;color:#374151;">${items}</ul>`;
@@ -318,14 +318,14 @@ function blockToHtml(node: JSONContent, answers: FormAnswers, questions: FormQue
 
     case "orderedList": {
       const items = (node.content ?? []).map(item => {
-        const body = (item.content ?? []).map(n => blockToHtml(n, answers, questions)).join("");
+        const body = (item.content ?? []).map(n => blockToHtml(n, answers, questions, pageless)).join("");
         return `<li style="margin-bottom:3px;">${body}</li>`;
       }).join("");
       return `<ol style="width:100%;box-sizing:border-box;margin:6px 0 6px 20px;padding:0;color:#374151;">${items}</ol>`;
     }
 
     case "blockquote": {
-      const inner = (node.content ?? []).map(n => blockToHtml(n, answers, questions)).join("");
+      const inner = (node.content ?? []).map(n => blockToHtml(n, answers, questions, pageless)).join("");
       return `<blockquote style="width:100%;box-sizing:border-box;border-left:3px solid #d1d5db;margin:8px 0;padding:4px 0 4px 12px;color:#6b7280;">${inner}</blockquote>`;
     }
 
@@ -360,31 +360,27 @@ function blockToHtml(node: JSONContent, answers: FormAnswers, questions: FormQue
 
     case "questionVariableBlock": {
       const { label = "", variableKey, questionType, colSpan = 12, questionId } = node.attrs ?? {};
-      const widthPct = `${Math.round((colSpan / 12) * 100)}%`;
       const question = questions.find(q => q.id === questionId || q.variableKey === variableKey);
-
-      let valueHtml: string;
       const isApproval = (questionType as string) === "approval";
 
+      let valueHtml: string;
       if (isApproval) {
         valueHtml = approvalHtml(answers[variableKey as string]);
       } else if (question?.multiField && (question.subFields?.length ?? 0) > 0) {
         valueHtml = multiFieldHtml(question, answers, label as string);
       } else if (question?.multiResponse) {
         const value = answers[variableKey as string];
-        if (Array.isArray(value) && value.length > 1) {
-          valueHtml = multiResponseListHtml(value, questionType as QuestionType);
-        } else {
-          valueHtml = answerHtml(value, questionType as QuestionType);
-        }
+        valueHtml = Array.isArray(value) && value.length > 1
+          ? multiResponseListHtml(value, questionType as QuestionType)
+          : answerHtml(value, questionType as QuestionType);
       } else {
-        const value = answers[variableKey as string];
-        valueHtml = answerHtml(value, questionType as QuestionType);
+        valueHtml = answerHtml(answers[variableKey as string], questionType as QuestionType);
       }
 
-      const blockWidth = isApproval ? "100%" : widthPct;
+      const widthPct = pageless ? "100%" : (isApproval ? "100%" : `${Math.round((colSpan / 12) * 100)}%`);
+      const marginBottom = pageless ? "margin-bottom:12px;" : "";
 
-      return `<div style="width:${blockWidth};box-sizing:border-box;padding:3px;vertical-align:top;">
+      return `<div style="width:${widthPct};box-sizing:border-box;padding:3px;vertical-align:top;${marginBottom}">
   <div style="border:1px solid #e5e7eb;border-radius:8px;padding:12px 16px;background:white;height:100%;box-sizing:border-box;">
     <div style="font-size:14px;font-weight:600;color:#1f2937;margin-bottom:8px;">${esc(label as string)}</div>
     ${valueHtml}
@@ -393,7 +389,7 @@ function blockToHtml(node: JSONContent, answers: FormAnswers, questions: FormQue
     }
 
     default:
-      if (node.content) return node.content.map(n => blockToHtml(n, answers, questions)).join("");
+      if (node.content) return node.content.map(n => blockToHtml(n, answers, questions, pageless)).join("");
       return "";
   }
 }
@@ -403,9 +399,15 @@ function blockToHtml(node: JSONContent, answers: FormAnswers, questions: FormQue
 export function generateReportHtml(
   editorJson: JSONContent,
   answers: FormAnswers,
-  questions: FormQuestion[] = []
+  questions: FormQuestion[] = [],
+  options: { pageless?: boolean } = {}
 ): string {
   if (!editorJson?.content) return "";
-  const body = editorJson.content.map(n => blockToHtml(n, answers, questions)).join("\n");
+  const body = editorJson.content
+    .map(n => blockToHtml(n, answers, questions, options.pageless))
+    .join("\n");
+  if (options.pageless) {
+    return `<div style="display:block;">${body}</div>`;
+  }
   return `<div style="display:flex;flex-wrap:wrap;align-items:flex-start;align-content:flex-start;">${body}</div>`;
 }
