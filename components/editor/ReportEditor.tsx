@@ -1815,10 +1815,6 @@ export function ReportEditor() {
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-300 text-gray-700 text-xs font-medium hover:bg-gray-50 transition-colors">
                 <FolderOpen size={13} /> Load
               </button>
-              <button onClick={handleReset} title="Reset to demo"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-gray-300 text-gray-500 text-xs font-medium hover:bg-gray-50 hover:text-gray-700 transition-colors">
-                <RotateCcw size={13} /> Reset
-              </button>
             </div>
 
             <div className="w-px h-5 bg-gray-200" />
@@ -1856,6 +1852,14 @@ export function ReportEditor() {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 text-xs font-medium hover:bg-gray-50 transition-colors disabled:opacity-50">
               {exporting === "pdf" ? <Loader2 size={13} className="animate-spin" /> : <FileDown size={13} />}
               PDF
+            </button>
+
+            <div className="w-px h-5 bg-gray-200" />
+
+            {/* Demo-only reset */}
+            <button onClick={handleReset} title="Reset to demo content"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-dashed border-gray-300 text-gray-400 text-xs font-medium hover:border-gray-400 hover:text-gray-600 transition-colors">
+              <RotateCcw size={13} /> Reset Demo
             </button>
           </div>,
           headerActionsEl,
