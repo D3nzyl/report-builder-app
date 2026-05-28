@@ -725,7 +725,7 @@ export function VariableBlockView({ node, editor, getPos, deleteNode, updateAttr
         <div className={`rounded-lg border bg-white px-4 py-3 transition-colors ${isDragging ? "border-blue-400 shadow-sm" : "border-gray-200 hover:border-gray-300"}`}>
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center min-w-0 flex-1">
-              <span className="text-sm font-semibold text-gray-800 leading-snug truncate">{label}</span>
+              <span className="text-sm font-semibold text-gray-800 leading-snug truncate" title={label}>{label}</span>
               {modeBadge}
             </div>
 

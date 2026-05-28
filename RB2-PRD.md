@@ -1,92 +1,125 @@
 # Product Requirements Document
 
-| Field | Value |
-|---|---|
-| **Feature Name** | Report Builder V2.0 |
-| **Feature Code** | RB2 |
-| **Product Manager** | Denzyl |
-| **Product Owner** | Isaac |
-| **Target Release** | 30 Jun 2026 |
-| **Status** | Draft |
+**Feature Name:** Report Builder V2.0
+**Product Manager:** — Denzyl
+**Product Owner:** — Isaac
+**Target Release:** — 30 Jun 2026
 
 ---
 
 ## Executive Summary
 
-Report Builder V2.0 is a redesigned, document-first report template editor that replaces the existing coordinate-based drag-and-drop approach with a rich text document canvas.
+Report Builder V2.0 is a document-first report template editor that replaces the coordinate-based drag-and-drop approach of V1.0 with a rich text document canvas.
 
-Solution creators write report templates like a document — using headings, paragraphs, tables, and lists — and insert workflow variables (form answers, approvals, metadata) directly into the template as either inline values within text or as standalone answer blocks. The builder supports multi-response and multi-field variable rendering, giving creators control over how compound answers appear in the generated report. Report templates can be previewed with sample data and exported as PDF or Markdown.
+Solution creators write report templates like a document — headings, paragraphs, tables, lists — and insert workflow variables (form answers, approvals) directly into the template as inline chips within text or as standalone question-answer blocks. The builder supports multi-response variables, multi-field compound variables, approval blocks, and remarks and image attachments per question. Templates can be previewed with sample data and exported as PDF or Markdown.
 
 ---
 
 ## Problem Statement
 
 ### Problem
-Solution creators need a way to build report templates that accurately reflect workflow outputs — including complex, multi-answer questions and multi-field compound questions — without relying on developers.
+Solution creators need a way to build report templates that accurately reflect workflow outputs — including complex, multi-answer questions, multi-field compound questions, approval decisions, and tabular collection data — without relying on developers.
 
 ### Current State (V1.0)
-Report Builder V1.0 uses an X/Y coordinate drag-and-drop layout where creators position text and variable blocks on a fixed canvas.
-
-While functional for simple reports, the coordinate model does not scale. It is difficult to produce readable, document-like reports because positioning and text flow must be managed manually. There is no native concept of document structure, and there is no way to represent questions that have multiple responses or sub-fields.
+Report Builder V1.0 uses an X/Y coordinate drag-and-drop layout where creators position text and variable blocks on a fixed canvas. While functional for simple reports, the coordinate model does not scale. Producing readable, document-like reports requires manual positioning, there is no native document structure, and there is no way to represent questions with multiple responses or sub-fields.
 
 ### Pain Points
 
-- The coordinate-based canvas is difficult to use for document-style reports; aligning text and variables requires manual positioning.
+- The coordinate-based canvas is difficult to use for document-style reports.
 - There is no concept of document structure — headings, paragraphs, and lists cannot be composed naturally.
-- Variables can only be placed as static positioned blocks; there is no way to embed a variable value inline within a sentence.
-- There is no support for multi-response variables, so questions where the respondent gives multiple answers cannot be represented in the report.
-- There is no support for multi-field (compound) questions with sub-questions.
-- The preview does not reflect the actual generated output accurately enough for creators to trust what they are building.
-- There is no export to PDF from within the builder.
+- Variables can only be placed as static positioned blocks; embedding a value inline within a sentence is not possible.
+- No support for multi-response variables (questions with multiple answers).
+- No support for multi-field (compound) questions with sub-questions.
+- No support for remarks or image evidence attached to individual questions.
+- No way to include collection / database query results in a report.
+- The preview does not accurately reflect the generated output.
+- No in-builder PDF export.
 
 ---
 
 ## Proposed Solution
 
-Report Builder V2.0 replaces the coordinate canvas with a structured document editor. Creators write report templates as rich text documents and insert workflow variables at any point. The builder handles rendering, multi-response logic, table generation, and export automatically.
+Report Builder V2.0 provides the main editor framework for creating report templates linked to workflow outputs. This PRD defines the document editor canvas, variable insertion and display, block layouts per question type, remarks and image support, approval blocks, and report export. The detailed configuration of how variables are sourced from a workflow will be covered in the Workflow Builder PRD.
 
-### Feature List
+[RB2-FR1] Rich Text Editor Canvas
+[RB2-FR2] Variable Insertion (@ Menu)
+[RB2-FR3] Inline Variable Display
+[RB2-FR4] Block Variable Display & Width Control
+[RB2-FR5] Multi-Response Variable Support
+[RB2-FR6] Multi-Field Variable Support
+[RB2-FR7] Multi-Field + Multi-Response Table View
+[RB2-FR8] Table Column Management
+[RB2-FR9] Remarks & Image Support
+[RB2-FR10] Approval Variable Blocks
+[RB2-FR11] Block Handle (Add & Drag)
+[RB2-FR12] Pageless / A4 Page Mode
+[RB2-FR13] Report Preview
+[RB2-FR14] Report Export (PDF)
+[RB2-FR15] Template Persistence (Save / Load JSON)
 
-| Code | Feature |
-|---|---|
-| RB2-FR1 | Rich Text Editor Canvas |
-| RB2-FR2 | Variable Insertion |
-| RB2-FR3 | Inline Variable Display |
-| RB2-FR4 | Block Variable Display & Width Control |
-| RB2-FR5 | Multi-Response Variable Support |
-| RB2-FR6 | Multi-Field Variable Support |
-| RB2-FR7 | Multi-Field + Multi-Response Table View |
-| RB2-FR8 | Table Column Management |
-| RB2-FR9 | Report Preview |
-| RB2-FR10 | Report Export (PDF & Markdown) |
-| RB2-FR11 | Question & Variable Configuration |
-| RB2-FR12 | Template Persistence (Save / Load JSON) |
+### Question Types
+
+The following question types are supported across the form variable system. Each type has a distinct editor placeholder, inline chip representation, and block layout.
+
+**Text & Numeric**
+- short_text — single-line text answer
+- long_text — multi-line text answer
+- number — numeric value
+
+**Selection**
+- radio — single choice from a list of options (radio button style)
+- single_select — single choice from a dropdown
+- multi_select — multiple choices from a list; answers render as chips
+- toggle — binary yes / no switch
+
+**Scale**
+- rating — star rating (0–5)
+- slider — numeric value along a range (0–100)
+
+**Date & Time**
+- date — calendar date
+- datetime — calendar date and time
+
+**Media & Files**
+- image_upload — one or more uploaded images
+- file_upload — uploaded file attachment
+- signature — drawn signature
+- sketch — freehand sketch or drawing
+
+**Location**
+- location — GPS coordinates or address
+
+**Approval** *(special type — see RB2-FR10)*
+- approval — a structured approval decision (approved or rejected) with person, date, signature or remarks, and optional images
 
 ### Exclusions
 
 - Detailed form builder configuration (covered by Form Builder PRD)
 - Workflow execution engine and runtime data fetching
 - Multi-template versioning and approval flows
-- Role-based template access control beyond basic workflow-level permissions
-- Conditional sections (show/hide sections based on answer values)
+- Role-based template access control beyond workflow-level permissions
+- Conditional sections (show/hide based on answer values)
 - Image annotation or sketch rendering in the generated report
+- Collections and SQL data blocks
+- Variable tray / sidebar (prototype-only demo, not a shipped feature)
 
 ---
 
 ## [RB2-FR1] Rich Text Editor Canvas
 
 ### Purpose
-Replace the coordinate-based V1.0 canvas with a document editor that lets creators write report templates as structured rich text. The canvas is the primary workspace for building the report layout.
+Replace the coordinate-based V1.0 canvas with a document editor that lets creators write report templates as structured rich text.
 
 ### Expected Behaviour
 
 **Text formatting**
-- Headings (H1, H2, H3)
-- Paragraphs with inline bold, italic, underline, strikethrough
+- Headings H1, H2, H3
+- Inline bold, italic, underline, strikethrough
 - Bullet lists and numbered lists
 - Blockquotes
 - Code blocks
-- Horizontal rules / dividers
+- Horizontal rule / divider
+- Native table (rows and columns)
 
 **Document structure**
 - Content flows top-to-bottom in document order
@@ -96,42 +129,82 @@ Replace the coordinate-based V1.0 canvas with a document editor that lets creato
 **Standard editing interactions**
 - Keyboard shortcuts for common formatting
 - Formatting toolbar at the top of the editor
-- Context formatting menu on text selection for quick formatting actions
-- `/` command menu for inserting block elements
-- `@` mention menu for inserting variables (see RB2-FR2)
+- Bubble menu appears on text selection for quick formatting
+- `/` command menu for block insertion
+- `@` mention menu for variable insertion (see RB2-FR2)
+- Block handle on hover for drag-reorder and inline block insertion (see RB2-FR11)
 
-**Visual guidance**
-- The canvas visually reflects the approximate proportions of an A4 page so creators have a sense of how the output will look while editing
+### / Slash Command Menu
 
-### Lo-Fi Notes
-- Not Applicable
+**Trigger:** typing `/` at the beginning of a line (or as the only content on a line)
+
+**Structure:**
+```
+┌──────────────────────────────────┐
+│ BLOCKS                           │
+│ [H1] Heading 1   [H2] Heading 2  │
+│ [H3] Heading 3   [¶]  Paragraph  │
+│ [•]  Bullet      [1.] Numbered   │
+│ ["]  Quote       [<>] Code Block │
+│ [—]  Divider     [⊞]  Table      │
+└──────────────────────────────────┘
+```
+
+**Behaviour:**
+- Filters as the creator types more characters after `/`
+- Each item is an icon + label in a 2-column grid
+- Selecting an item deletes the `/query` text and inserts the chosen block
+- If no items match the query the menu closes
+- Escape dismisses without inserting
+- Arrow keys and Enter for keyboard navigation
 
 ---
 
-## [RB2-FR2] Variable Insertion
+## [RB2-FR2] Variable Insertion (@ Menu)
 
 ### Purpose
-Let creators insert workflow variables into the template without leaving the keyboard. Variables can be inserted as inline values embedded in text, or as standalone answer blocks.
+Let creators insert workflow variables and collection data into the template without leaving the keyboard.
 
 ### Expected Behaviour
 
-**@ Menu**
-- Triggered by typing `@` anywhere in the editor
-- Shows a searchable list of all available variables
-- The list filters as the creator continues typing
-- Selecting a variable inserts it as an inline value by default, except for Multi Field variables which always insert as a block
-- Pressing Escape dismisses the menu without inserting
+**Triggering**
+- Typing `@` anywhere in the editor opens the @ menu
+- The menu filters as the creator continues typing after `@`
+- Pressing Escape dismisses without inserting
 
-**Slash Command Menu**
-- Triggered by typing `/` at the start of a line
-- Shows formatting and block options alongside a variable block option
-- Selecting the variable block option opens the variable picker and inserts a block
+**Tabs**
+- The @ menu has two tabs: **Form** and **Approval**
+- Form: shows all form question variables
+- Approval: shows all approval-type variables
+
+**Inserting a variable**
+- Selecting a variable inserts it as an inline chip by default
+- Exception: Multi Field variables and Approval variables always insert as a block
 
 **Keyboard navigation**
-- Arrow keys to navigate the menu, Enter to select, Escape to dismiss
+- Arrow Up / Down to navigate, Enter to confirm, Escape to dismiss
 
-### Lo-Fi Notes
-- Not Applicable
+### @ Mention Menu Design
+
+**Trigger:** typing `@` anywhere in the editor
+
+**Structure:**
+```
+┌─────────────────────────┐
+│  Form | Approval        │  ← tab bar
+├─────────────────────────┤
+│  [icon]  Variable Label │
+│  [icon]  Variable Label │
+│  ...                    │
+└─────────────────────────┘
+```
+
+**Row anatomy:**
+- Question-type icon + variable label
+- Row highlights on hover and keyboard selection
+- Click or Enter inserts the variable
+
+**Positioning:** appears below the cursor; flips above if insufficient space below
 
 ---
 
@@ -142,296 +215,510 @@ Allow variables to appear embedded within sentences or paragraphs, rendering the
 
 ### Expected Behaviour
 
-- An inline variable appears as a styled chip inside a paragraph showing the variable label or alias
-- In the editor, the chip is non-editable but selectable and deletable
-- In the preview and export, the chip is replaced with the actual answer value
-- Only simple (non-multi-field) variables can be inserted inline
-- A creator can switch an inline variable to block display and vice versa via the variable's action menu
+**Chip appearance**
+- An inline variable renders as a styled chip showing the variable label
+- The chip has a subtle background and border to distinguish it from plain text
+- When selected (part of a text selection), the chip highlights in blue
+- The chip is non-editable but selectable and deletable
+- Long variable names are truncated with `…` at a maximum chip width; hovering the chip shows a tooltip with the full question label
 
-### Lo-Fi Notes
-- Not Applicable
+**Display type**
+- An inline variable can display one of three values via the 3-dot menu:
+  - **Answer** — shows the answer value (default)
+  - **Remarks** — shows the remarks text for that answer; chip label shows `{label} · remarks`
+  - **Remarks Image** — shows the remarks image for that answer; chip label shows `{label} · image`
+- Remarks and Remarks Image options are only available if the question has "Allow Remarks" enabled (see RB2-FR9)
+
+**Switching to block**
+- From the inline 3-dot menu, the creator can switch the variable to block display (see RB2-FR4)
+
+**In preview and export**
+- The chip is replaced by the actual answer value, remarks text, or remarks image depending on the display type
+
+**Constraints**
+- Only non-multi-field variables can be inserted inline
+- Approval variables always insert as blocks
+
+### Inline Chip 3-Dot Menu Design
+
+**Trigger:** hovering an inline chip reveals a `···` overlay on the right side of the chip
+
+**Structure:**
+```
+┌──────────────────────┐
+│ SHOW                 │
+│ T   Answer        ✓  │
+│ 💬  Remarks          │  ← only if Allow Remarks is on
+│ 🖼  Remarks Image    │  ← only if Allow Remarks is on
+├──────────────────────┤
+│ LAYOUT               │
+│ ≡   Switch to Block  │
+├──────────────────────┤
+│ 🗑  Delete           │
+└──────────────────────┘
+```
+
+**Behaviour:**
+- **Answer** — default; ✓ shown when active
+- **Remarks** — shows remarks text; chip label updates to `{label} · remarks`
+- **Remarks Image** — shows remarks image; chip label updates to `{label} · image`
+- **Switch to Block** — converts the inline chip to a full question-answer block
+- **Delete** — removes the chip from the document
 
 ---
 
 ## [RB2-FR4] Block Variable Display & Width Control
 
 ### Purpose
-Allow variables to occupy their own dedicated area in the report, displaying both the question label and the answer value as a standalone card. Creators can control how wide each block is relative to the page.
+Allow variables to occupy a dedicated area in the report, displaying the question label and answer value as a standalone card. Creators control how wide each block is relative to the page.
 
 ### Expected Behaviour
 
 **Block card**
-- Renders as a card showing the variable label and its answer placeholder or value
-- The card is visually distinct from paragraph content
-- Multiple block variables on the same row share the horizontal space
+- Renders as a card showing the variable label and a type-appropriate placeholder or value
+- Visually distinct from paragraph content
+- Multiple blocks on adjacent rows share horizontal space based on their configured widths
+- Long variable names are truncated with `…` in the block header; hovering the label shows a tooltip with the full question label
 
 **Width control**
-- Each block can be resized between a minimum width and full page width
+- Each block spans between a minimum of 4 columns and a maximum of 12 columns (full width) on a 12-column grid
 - A drag handle is visible on hover at the right edge of the block
-- Dragging snaps to column divisions so blocks align neatly
-- Guide lines are visible during drag to assist with alignment
+- Dragging snaps to column divisions; guide lines appear during drag for alignment
 - Width is saved per block
+- Multi-response, multi-field, and approval blocks are always full width (resize disabled)
 
-**Display mode**
-- Via the block action menu, creators can switch between block display and inline display
-- Multi Field variables are always block; the inline option is hidden for them
+**Display mode switching**
+- Via the block 3-dot menu, creators can switch between Block and Inline display
+- Multi Field and Approval variables cannot be switched to inline
 
 **Delete**
-- Block can be deleted via the action menu or keyboard
+- Via the 3-dot menu or keyboard Delete
 
-### Lo-Fi Notes
-- Not Applicable
+### Block 3-Dot Menu Design
+
+**Trigger:** hovering a question variable block reveals a `···` button in the top-right corner
+
+**Structure:**
+```
+┌──────────────────┐
+│ DISPLAY AS       │
+│ ≡  Block      ✓  │
+│ T  Inline        │  ← hidden for multi-field and approval
+├──────────────────┤
+│ 🗑 Delete        │
+└──────────────────┘
+```
+
+**Behaviour:**
+- **Block** — current mode; ✓ shown; clicking is a no-op
+- **Inline** — switches to an inline chip inside a new paragraph; hidden if Multi Field or Approval
+- **Delete** — removes the block from the document
+
+### Block Layout Anatomy
+
+Every question variable block follows this structure:
+
+```
+┌──────────────────────────────────────────────┐
+│  Question Label           [mode badge]  [···] │
+│                                               │
+│  [answer area — varies by type, see below]    │
+│                                               │
+│  ─────────────────────────────────────────    │  ← only when Allow Remarks is on
+│  REMARKS                                      │
+│  [text placeholder, 2 lines]                  │
+│                                               │
+│  IMAGE (optional)                             │
+│  [image placeholder]                          │
+└──────────────────────────────────────────────┘
+```
+
+The remarks + image section only appears when "Allow Remarks" is enabled on the question (see RB2-FR9).
+
+### Answer Area by Question Type
+
+- **short_text** — Single line text bar
+- **long_text** — Three line text bars (last line 60% width)
+- **number** — Large light "0" numeral
+- **radio** — Three radio options: filled dot on first, empty on rest
+- **rating** — Five grey star icons + "0 / 5" label
+- **toggle** — Toggle switch (off state) + "No" label
+- **single_select** — Single pill chip: "Selected option"
+- **multi_select** — Three pill chips: "Option 1", "Option 2", "Option 3"
+- **slider** — Track bar with thumb at 33%; min / max labels below
+- **date** — DD / MM / YYYY segments in monospace
+- **datetime** — DD / MM / YYYY · HH : MM in monospace
+- **file_upload** — Dashed border box + upload icon + "File will appear here"
+- **signature** — Bordered box with decorative SVG signature path + baseline
+- **sketch** — Dashed border + dot-grid background + pencil icon
+- **location** — Stylised map tile with road grid + red pin + coordinates badge
+- **image_upload** — Dashed border box + image icon + "Image will appear here"
 
 ---
 
 ## [RB2-FR5] Multi-Response Variable Support
 
 ### Purpose
-Support variables where the respondent has given multiple answers (e.g. a recurring inspection item answered multiple times). Multi-response variables render each answer as a separate entry.
+Support variables where the respondent has given multiple answers. Multi-response variables render each answer as a separate entry.
 
 ### Expected Behaviour
 
-**Enabling Multi Response**
-- Any variable type can be set to Multi Response
-- Multi Response is independent of Multi Field — both can be active on the same variable
+**Enabling**
+- Any variable type can be set to Multi Response via the variable tray
+- Multi Response can coexist with Multi Field
 
-**Editor preview**
-- A multi-response block shows placeholder rows to indicate multiple values will appear
-- The block takes up the full page width and cannot be resized narrower
+**Block preview (editor)**
+- The block shows stacked placeholder rows to indicate multiple values will appear
+- Always full width; resize is disabled
 
 **In preview and export**
 - Each response renders as a numbered list item within the block
-- Exception: a multi-select question always renders its selected options as chips, not as a numbered list, even when Multi Response is enabled
+- Exception: multi-select questions render options as chips regardless of Multi Response
 
-### Lo-Fi Notes
-- Not Applicable
+### Multi-Response Block Layout
+
+```
+┌────────────────────────────────────────────┐
+│  Question Label               multi-response│
+│                                             │
+│  ┌─────────────────────────────────────┐   │
+│  │  [answer placeholder — row 1]       │   │
+│  └─────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────┐   │  ← 40% opacity
+│  │  [answer placeholder — row 2]       │   │
+│  └─────────────────────────────────────┘   │
+└────────────────────────────────────────────┘
+```
+
+- Always full width; resize handle hidden
 
 ---
 
 ## [RB2-FR6] Multi-Field Variable Support
 
 ### Purpose
-Support compound variables with sub-questions. Multi-field variables group related sub-questions under one parent variable, which the creator inserts as a single block.
+Support compound variables with named sub-questions. Multi-field variables group related sub-questions under one parent.
 
 ### Expected Behaviour
 
-**Enabling Multi Field**
-- Set via a toggle on the parent variable in the variable configuration panel
-- Once enabled, sub-fields can be added to the parent variable
+**Enabling**
+- Set via the Multi Field toggle on the parent variable in the variable tray
+- Sub-fields can be added once enabled; each has a label and a question type
 
-**Sub-field definition**
-- Each sub-field has a label and a type (all question types supported)
+**Sub-field rules**
 - Each sub-field can independently have Multi Response enabled
-- Only the parent variable is available for insertion — sub-fields cannot be inserted individually
-- Multi Field within a Multi Field is not supported (no nesting)
+- Sub-fields cannot be inserted individually — only the parent variable is insertable
+- Nested multi-field (sub-field of a sub-field) is not supported
 
-**Editor preview (Multi Field only, no Multi Response)**
-- Renders as a stacked list of sub-field cards, each showing the sub-field label and a type-appropriate placeholder
+**Block preview — Multi Field only (no Multi Response)**
+- Renders as stacked sub-field cards, each showing the sub-field label and a type-appropriate placeholder
 
-**Editor preview (Multi Field + Multi Response)**
+**Block preview — Multi Field + Multi Response**
 - Renders as a table (see RB2-FR7)
 
-**In preview and export**
-- Multi Field without Multi Response: renders as grouped sub-field answer sections
-- Multi Field with Multi Response: renders as a table (see RB2-FR7)
+### Multi-Field Block Layout (no Multi Response)
 
-### Lo-Fi Notes
-- Not Applicable
+```
+┌────────────────────────────────────────────┐
+│  Question Label                  multi-field│
+│                                             │
+│  ┌─────────────────────────────────────┐   │
+│  │  Sub-field 1 label                  │   │
+│  │  [sub-field answer placeholder]     │   │
+│  └─────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────┐   │
+│  │  Sub-field 2 label                  │   │
+│  │  [sub-field answer placeholder]     │   │
+│  └─────────────────────────────────────┘   │
+└────────────────────────────────────────────┘
+```
 
 ---
 
 ## [RB2-FR7] Multi-Field + Multi-Response Table View
 
 ### Purpose
-When a variable has both Multi Field and Multi Response enabled, render it as a table where columns are sub-fields and rows are response instances.
+When a variable has both Multi Field and Multi Response active, render it as a table where columns are sub-fields and rows are response instances.
 
 ### Expected Behaviour
 
 **Table structure**
-- Columns correspond to each visible sub-field (in the configured order)
-- Rows correspond to each response instance
-- Column headers show the sub-field label (which can be renamed — see RB2-FR8)
+- Columns correspond to visible sub-fields in the configured order
+- Rows correspond to response instances
+- Column headers show the sub-field label (renameable — see RB2-FR8)
 
-**Editor preview**
-- Shows placeholder rows to indicate a multi-row table
-- The table always fills the full width of the block
+**Sub-field with Multi Response inside a table**
+- A sub-field with Multi Response enabled renders its cell as a bulleted list of values
 
-**Sub-field with Multi Response within a table**
-- If a sub-field also has Multi Response enabled, its cell displays a list of values within the table cell
+**Always full width**
 
 **In preview and export**
-- Table renders with actual answer data
-- Each row is one response instance
-- Sub-field Multi Response cells render as a bulleted list within the cell
+- Table renders with actual answer data, respecting configured column order, headers, and widths
 
-**Width**
-- Table blocks always occupy full page width
+### Multi-Field + Multi-Response Table Layout
 
-### Lo-Fi Notes
-- Not Applicable
+```
+┌────────────────────────────────────────────────────────────┐
+│  Question Label                                            │
+│                                                            │
+│  ┌──────────┬──────────┬──────────┬──────────┐            │
+│  │ Sub 1    │ Sub 2    │ Sub 3    │ Sub 4    │  ← headers (renameable, resizable)
+│  ├──────────┼──────────┼──────────┼──────────┤            │
+│  │ [value]  │ [value]  │ [value]  │ [value]  │  ← row 1 (full opacity)
+│  ├──────────┼──────────┼──────────┼──────────┤            │
+│  │ [value]  │ [value]  │ [value]  │ [value]  │  ← row 2 (40% opacity)
+│  └──────────┴──────────┴──────────┴──────────┘            │
+└────────────────────────────────────────────────────────────┘
+```
+
+- Resize handles on column borders (not last column)
+- Click header to rename; always full width
 
 ---
 
 ## [RB2-FR8] Table Column Management
 
 ### Purpose
-Give creators control over which columns appear in a multi-field + multi-response table, their display order, header labels, and relative widths.
+Give creators control over column header labels, relative widths, and display order in multi-field + multi-response tables.
 
 ### Expected Behaviour
 
 **Column header editing**
-- Clicking a column header in the editor opens an inline text input
-- The creator can rename the column header independently of the underlying sub-field label
-- Saving the header does not affect the sub-field definition
+- Clicking a column header opens an inline text input
+- The header can be renamed independently of the underlying sub-field label
 
 **Column width resizing**
-- A drag handle sits on the right border of each column header, except the last column
-- Dragging moves only the border between two adjacent columns — one grows and the other shrinks by the same amount
-- No other columns are affected by the drag
-- Each column has a minimum width to remain legible
-- The last column has no resize handle because the table always fills the full page width
+- A resize handle sits on the right border of each column header except the last
+- Dragging the handle resizes only the two adjacent columns; all others remain unchanged
+- Each column has a minimum width
+- The last column has no handle; the table always fills full page width
 
 **Proportional widths**
-- Column widths are stored as proportional values so the table always fills the available width without scrolling, regardless of page size or screen resolution
-
-**In preview and export**
-- Column header labels, column order, and column width proportions match exactly what is configured in the editor
-
-### Lo-Fi Notes
-- Not Applicable
+- Widths are stored proportionally so the table fills the available width at any screen or page size
 
 ---
 
-## [RB2-FR9] Report Preview
+## [RB2-FR9] Remarks & Image Support
 
 ### Purpose
-Allow creators to see how the report will look with sample answer data before exporting, without leaving the builder.
+Allow solution creators to mark individual form questions as supporting remarks, so that respondents can attach a text note and up to one image as evidence alongside their answer. The report template can then display these remarks as block sections or as inline references.
 
 ### Expected Behaviour
 
-**Opening preview**
-- A Preview button in the toolbar opens a preview overlay
-- The preview reflects the editor content and variable configuration at the time it is opened
-- Changes made after opening are not reflected until the preview is closed and reopened
+**Enabling remarks on a question**
+- Each question in the variable tray has an "Allow Remarks" toggle
+- When enabled, the block view of that question renders a Remarks section and an Image section below the answer
+- When enabled, the inline 3-dot menu for that variable exposes two extra display options: Remarks and Remarks Image
 
-**Preview rendering**
-- Renders the template as an A4-proportioned page with all variables replaced by their sample answers
-- All formatting, variable blocks, inline values, and tables are rendered as they would appear in the exported report
-- Multi-response blocks render as numbered lists
-- Multi-field table blocks render as full tables with the configured widths and headers
+**Block display with remarks**
+- Below the answer area, a horizontal divider separates the answer from a "Remarks" sub-section
+- The Remarks sub-section shows a multi-line text placeholder
+- Below remarks, an "Image (optional)" section shows a dashed image placeholder
+- Applies to all non-approval question types
 
-**Sample answers**
-- Preview uses the sample answers configured per variable
-- A label in the preview indicates that sample answers are being used
+**Inline display options (when Allow Remarks is on)**
+- From the inline chip 3-dot menu, the creator can choose:
+  - **Answer** — displays the answer value (default)
+  - **Remarks** — displays the remarks text; chip shows `{label} · remarks`
+  - **Remarks Image** — displays the remarks image; chip shows `{label} · image`
 
-### Lo-Fi Notes
-- Not Applicable
+**Constraints**
+- Approval blocks do not support remarks (they have their own remarks field by design)
+- Each question supports at most one remarks image
+
+### Block with Remarks Layout (Example: short_text)
+
+```
+┌────────────────────────────────────────────┐
+│  Question Label                       [···] │
+│                                             │
+│  [single line text placeholder]             │
+│                                             │
+│  ──────────────────────────────────         │
+│  REMARKS                                    │
+│  [text line 1 ────────────────────]         │
+│  [text line 2 ──────────── ]                │
+│                                             │
+│  IMAGE (optional)                           │
+│  ┌───────────────────────────────────────┐  │
+│  │  [🖼]  Image will appear here         │  │
+│  └───────────────────────────────────────┘  │
+└────────────────────────────────────────────┘
+```
 
 ---
 
-## [RB2-FR10] Report Export (PDF & Markdown)
+## [RB2-FR10] Approval Variable Blocks
 
 ### Purpose
-Allow creators to export the rendered report template as a PDF or Markdown file.
+Render approval decisions (approved or rejected) as structured blocks with a fixed layout that shows all relevant approval metadata.
 
 ### Expected Behaviour
 
-**PDF Export**
-- Accessible from an Export button in the toolbar
-- Generates a PDF from the rendered report at A4 dimensions with standard margins
-- All formatting, variable values, and table layouts are preserved
-- A loading state is shown during generation
+**Approved state layout**
+- Three equal-width columns in a fixed-height row:
+  - Column 1: "Approved by" — shows person's name
+  - Column 2: "Date" — shows approval date
+  - Column 3: "Signature" — shows signature canvas
 
-**Markdown Export**
-- Generates a Markdown file with all variables resolved to their sample answer values
-- Rich text formatting is converted to standard Markdown
-- Multi-field + multi-response blocks render as Markdown tables
-- Column order from the editor is respected in the exported table
+**Rejected state layout**
+- Three equal-width columns in a fixed-height row:
+  - Column 1: "Rejected by" — shows person's name
+  - Column 2: "Date" — shows rejection date
+  - Column 3: "Remarks" — shows rejection remarks text
+- Below the row: an "Images (optional)" section
 
-**General**
-- Both exports use the current sample answers at the time of export
-- The exported file is downloaded to the user's device
+**Always full width; resize disabled**
 
-### Lo-Fi Notes
-- Not Applicable
+**Approval variables are always inserted as blocks; inline insertion is not available**
+
+### Approval Block Layouts
+
+**Approved:**
+```
+┌────────────────────────────────────────────────────────────┐
+│  Question Label                                            │
+│                                                            │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────┐ │
+│  │ APPROVED BY      │  │ DATE             │  │SIGNATURE │ │
+│  │ Isaac Tan        │  │ 22 May 2026      │  │ [sig SVG]│ │
+│  └──────────────────┘  └──────────────────┘  └──────────┘ │
+└────────────────────────────────────────────────────────────┘
+```
+
+**Rejected:**
+```
+┌────────────────────────────────────────────────────────────┐
+│  Question Label                                            │
+│                                                            │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────┐ │
+│  │ REJECTED BY      │  │ DATE             │  │REMARKS   │ │
+│  │ Sarah Lim        │  │ 21 May 2026      │  │[text…]   │ │
+│  └──────────────────┘  └──────────────────┘  └──────────┘ │
+│                                                            │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ IMAGES (optional)  [image placeholder]               │  │
+│  └──────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## [RB2-FR11] Question & Variable Configuration
+
+## [RB2-FR11] Block Handle (Add & Drag)
 
 ### Purpose
-Allow creators to define, edit, and manage the full set of variables available in the report template, including their types, sample answers, display settings, and multi-response / multi-field configuration.
+Give creators a way to add new blocks adjacent to any existing block and to reorder blocks by dragging, without using the keyboard.
 
 ### Expected Behaviour
 
-**Variable settings (per variable)**
-- Label (editable)
-- Type — all question types supported: short text, long text, number, date, date & time, radio, single select, multi select, toggle, rating, slider, image upload, file upload, signature, sketch, location
-- Alias — optional display name used when the variable is inserted into the template
-- Sample answer — used in preview and export
-- Multi Response toggle
-- Multi Field toggle
+**Visibility**
+- The block handle appears to the left of any block when the cursor hovers that block
+- It fades out when the cursor moves away
 
-**Sub-field management (when Multi Field is active)**
-- Add sub-field: requires label and type
-- Remove sub-field
-- Each sub-field has: label, type, optional Multi Response toggle
-- The same full type list applies to sub-fields as to top-level variables
+**+ button**
+- Opens the Add Block menu (see design below)
+- The new block is inserted immediately below the hovered block
 
-**Adding new variables**
-- Creators can add new variables manually, for example when the workflow is not yet finalised
-- New variable requires a label and type
+**Drag grip**
+- A grip icon sits next to the + button
+- Dragging the grip moves the block to a new position in the document
+- Cursor changes to `grab` on hover and `grabbing` during drag
 
-### Lo-Fi Notes
-- Not Applicable
+### + Add Block Menu Design
+
+**Trigger:** clicking the `+` button in the block handle
+
+**Structure:**
+```
+┌──────────────────────────────────┐
+│ BLOCKS                           │
+│ [H1] Heading 1   [H2] Heading 2  │
+│ [H3] Heading 3   [¶]  Paragraph  │
+│ [•]  Bullet      [1.] Numbered   │
+│ ["]  Quote       [<>] Code Block │
+│ [—]  Divider     [⊞]  Table      │
+└──────────────────────────────────┘
+```
+
+- Same block list as the / slash menu
+- Inserts immediately after the hovered block
+- Closes after selection or outside click
 
 ---
 
-## [RB2-FR12] Template Persistence (Save / Load JSON)
+## [RB2-FR12] Pageless / A4 Page Mode
 
 ### Purpose
-Allow report templates to be saved and restored, supporting draft saving, template management, and integration with the Workflow Builder.
+Let creators choose between a pageless scrolling canvas and a paginated A4 canvas.
+
+### Expected Behaviour
+
+**Pageless mode**
+- Content flows without page breaks in a single scrollable canvas
+- Maximum width matches A4 proportions for visual reference
+- Default mode
+
+**A4 Page mode**
+- Canvas renders as discrete A4-sized pages (794 × 1122 px)
+- Each page is a separate editor instance
+- Content that overflows a page automatically creates a new page
+- Page number shown in the bottom-right corner of each page
+- Background is light grey to visually separate pages
+
+**Switching**
+- Mode toggled from the toolbar; switching does not lose document content
+
+---
+
+## [RB2-FR13] Report Preview
+
+### Purpose
+Let creators see how the report looks with sample data before exporting.
+
+### Expected Behaviour
+
+- A Preview button in the toolbar opens a full-screen overlay
+- The preview renders the template with all variables replaced by their sample answers
+- Approval blocks, multi-field tables, inline chips, and remarks sections all render as they would in the export
+- Closing and reopening picks up any changes made since the last open
+- A label indicates sample answers are in use
+
+---
+
+## [RB2-FR14] Report Export (PDF)
+
+### Purpose
+Let creators export the rendered report as a PDF.
+
+### Expected Behaviour
+
+- Generates a PDF at A4 dimensions with standard margins
+- All formatting, variable values, tables, and block layouts are preserved
+- Loading state shown during generation
+- Uses sample answers at the time of export
+- File downloads to the user's device
+
+---
+
+## [RB2-FR15] Template Persistence (Save / Load JSON)
+
+### Purpose
+Allow report templates to be saved and restored.
 
 ### Expected Behaviour
 
 **Save**
-- The current report template can be saved, preserving the full document content, all variable definitions, column configuration, and sample answers
+- Persists the full document content, all variable definitions, column configuration, column headers, column widths, and sample answers
 
 **Load**
-- A previously saved template can be loaded back into the builder, fully restoring the document and all variable configuration
-- Loading prompts for confirmation if there are unsaved changes in the current session
+- Restores the document and all variable configuration exactly
+- Prompts for confirmation if there are unsaved changes
 
 **Validation on load**
-- The system checks that the loaded template is valid and contains the required structure
-- If the template is invalid or from an unsupported version, a clear error is shown and the load does not proceed
-- Variable references in the document that cannot be matched to a variable definition are flagged as unresolved but preserved
+- Invalid or unsupported templates show a clear error; loading does not proceed
+- Variable references that cannot be matched to a definition are flagged as unresolved but preserved
 
-**Integration with Workflow Builder**
-- When the Report Builder is accessed from Workflow Builder V2.0 (via WB2-FR9), templates are saved against the workflow rather than as standalone files
-- Standalone save/load remains available for testing and migration
-
-### Lo-Fi Notes
-- Not Applicable
-
----
-
-## Non-Functional Requirements
-
-| Area | Requirement |
-|---|---|
-| Performance | Editor should feel responsive for typical report templates (up to ~50 variable blocks) |
-| Export | PDF export should complete within a reasonable time for a standard A4 report |
-| Compatibility | Must work in Chrome, Safari, and Edge (latest 2 versions) |
-| Accessibility | Keyboard navigation for all menus and variable insertion flows |
-| Responsiveness | Builder is a desktop-only tool |
-
----
-
-## Open Questions
-
-| # | Question | Owner | Status |
-|---|---|---|---|
-| 1 | Should sample answers be seeded from real workflow submission data, or always manually entered by the creator? | Denzyl / Isaac | Open |
-| 2 | How are report templates linked to a specific workflow version — does a template lock to a specific version, or always track the latest? | Isaac | Open |
-| 3 | Should conditional section rendering (show/hide sections based on answer values) be in scope for V2.0 or deferred? | Denzyl | Open |
-| 4 | For PDF export, is client-side generation sufficient or is server-side rendering required for print fidelity? | Engineering | Open |
+**Integration**
+- When accessed from Workflow Builder V2.0 (WB2-FR9), templates save against the workflow
+- Standalone save/load remains available for testing

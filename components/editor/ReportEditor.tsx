@@ -22,9 +22,8 @@ import { CollectionBlockNode } from "./CollectionBlockNode";
 import { RowRepeatBlockNode } from "./RowRepeatBlockNode";
 import { DataRowBlockNode } from "./DataRowBlockNode";
 import { ReportPreview } from "@/components/preview/ReportPreview";
-import { generateReportMarkdown } from "@/lib/reportGenerator";
 import { generateReportHtml } from "@/lib/reportHtmlGenerator";
-import { downloadMarkdown, exportPdfFromHtml } from "@/lib/exportUtils";
+import { exportPdfFromHtml } from "@/lib/exportUtils";
 import { sampleAnswers, sampleQuestions } from "@/lib/sampleData";
 import { sampleCollections, executeQuery } from "@/lib/collectionData";
 import type { Collection } from "@/lib/types";
@@ -1672,22 +1671,12 @@ export function ReportEditor() {
     };
   }
 
-  const getMarkdown = useCallback(() => {
-    const json = pageMode === "page" ? combinePageContents() : editor?.getJSON();
-    if (!json) return "";
-    return generateReportMarkdown(json, answers, questions);
-  }, [editor, answers, questions, pageMode, pageContents]); // eslint-disable-line
-
   function handlePreview() {
     const json = pageMode === "page" ? combinePageContents() : editor?.getJSON();
     if (!json) return;
     setPreviewJson(json);
     setPreviewQuestions(questions);
     setPreviewOpen(true);
-  }
-
-  function handleExportMd() {
-    downloadMarkdown(getMarkdown());
   }
 
   async function handleExportPdf() {
@@ -1733,10 +1722,6 @@ export function ReportEditor() {
             <button onClick={handlePreview}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-900 text-white text-xs font-medium hover:bg-gray-700 transition-colors">
               <Eye size={13} /> Preview
-            </button>
-            <button onClick={handleExportMd}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 text-xs font-medium hover:bg-gray-50 transition-colors">
-              <FileText size={13} /> Markdown
             </button>
             <button onClick={handleExportPdf} disabled={exporting === "pdf"}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 text-xs font-medium hover:bg-gray-50 transition-colors disabled:opacity-50">

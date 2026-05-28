@@ -102,6 +102,7 @@ export function VariableInlineView({ node, editor, getPos, deleteNode, updateAtt
       */}
       <span
         ref={chipRef}
+        title={label}
         className="relative inline-flex items-center select-none cursor-default leading-snug"
         style={{
           fontSize: "inherit",
@@ -110,11 +111,15 @@ export function VariableInlineView({ node, editor, getPos, deleteNode, updateAtt
           border: `1px solid ${chipBorder}`,
           background: chipBg,
           color: chipColor,
+          maxWidth: "14rem",
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => { if (!menuOpen) setHovered(false); }}
       >
-        {label}{chipSuffix && <span style={{ opacity: 0.55, fontSize: "0.85em" }}>{chipSuffix}</span>}
+        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: "1 1 0", minWidth: 0 }}>
+          {label}
+        </span>
+        {chipSuffix && <span style={{ opacity: 0.55, fontSize: "0.85em", flexShrink: 0 }}>{chipSuffix}</span>}
 
         {/* 3-dot: absolutely fills the right side of the chip, same height */}
         <span
