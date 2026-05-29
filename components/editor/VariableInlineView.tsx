@@ -211,8 +211,11 @@ export function VariableInlineView({ node, editor, getPos, deleteNode, updateAtt
             pointerEvents: "none",
           }}
         >
-          <div className="bg-gray-900 text-white text-[11px] font-medium rounded-lg px-2.5 py-1.5 whitespace-nowrap shadow-xl leading-none">
-            {label}
+          <div className="bg-gray-900 text-white text-[11px] rounded-lg px-2.5 py-1.5 whitespace-nowrap shadow-xl">
+            {question?.blockName && (
+              <div className="font-normal opacity-60 text-[10px] leading-none mb-1">{question.blockName}</div>
+            )}
+            <div className="font-medium leading-none">{label}</div>
           </div>
           <div
             className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0"

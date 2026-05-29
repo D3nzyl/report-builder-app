@@ -46,6 +46,7 @@ export interface FormQuestion {
   alias?: string;
   category?: VariableCategory; // default "form"
   system?: boolean;            // system-generated metadata, not a user question
+  blockName?: string;          // name of the form block this question belongs to
   multiResponse?: boolean;
   multiField?: boolean;
   subFields?: SubField[];

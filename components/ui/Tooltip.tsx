@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 
-export function Tooltip({ text, children }: { text: string; children: React.ReactNode }) {
+export function Tooltip({ text, subtext, children }: { text: string; subtext?: string; children: React.ReactNode }) {
   const [rect, setRect] = useState<DOMRect | null>(null);
   const ref = useRef<HTMLSpanElement>(null);
 
@@ -26,8 +26,11 @@ export function Tooltip({ text, children }: { text: string; children: React.Reac
             pointerEvents: "none",
           }}
         >
-          <div className="bg-gray-900 text-white text-[11px] font-medium rounded-lg px-2.5 py-1.5 whitespace-nowrap shadow-xl leading-none">
-            {text}
+          <div className="bg-gray-900 text-white text-[11px] rounded-lg px-2.5 py-1.5 whitespace-nowrap shadow-xl">
+            {subtext && (
+              <div className="font-normal opacity-60 text-[10px] leading-none mb-1">{subtext}</div>
+            )}
+            <div className="font-medium leading-none">{text}</div>
           </div>
           <div
             className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0"
