@@ -34,8 +34,23 @@ function inlineToHtml(nodes: JSONContent[], answers: FormAnswers): string {
     if (n.type === "text") return applyMarks(esc(n.text ?? ""), n.marks);
     if (n.type === "hardBreak") return "<br>";
     if (n.type === "questionVariableInline") {
-      const { variableKey, questionType } = n.attrs ?? {};
+      const { variableKey, questionType, displayType } = n.attrs ?? {};
       const raw = answers[variableKey as string];
+
+      if (questionType === "image_upload") {
+        const url = String(Array.isArray(raw) ? raw[0] : (raw ?? ""));
+        if (!url) return `<span style="color:#9ca3af;font-size:.875em;">No image</span>`;
+        return `<img src="${esc(url)}" alt="" style="max-width:100%;border-radius:6px;display:block;margin:4px 0;" />`;
+      }
+
+      if (displayType === "inline_remarks_image") {
+        let data: { images?: string[] } | null = null;
+        try { data = JSON.parse(raw as string); } catch { /* fall through */ }
+        const images = data?.images ?? [];
+        if (!images.length) return `<span style="color:#9ca3af;font-size:.875em;">No images</span>`;
+        return images.map(src => `<img src="${esc(src)}" alt="" style="max-width:100%;border-radius:6px;display:block;margin:4px 0;" />`).join("");
+      }
+
       const val = formatScalar(raw, questionType);
       return `<span style="background:#f3f4f6;border:1px solid #e5e7eb;border-radius:4px;padding:1px 6px;font-size:.875em;color:#374151">${esc(val)}</span>`;
     }

@@ -91,7 +91,17 @@ function inlineToMarkdown(node: MarkNode, answers: FormAnswers): string {
   if (node.type === "text") return markText(node.text ?? "", node.marks);
   if (node.type === "hardBreak") return "  \n";
   if (node.type === "questionVariableInline") {
-    const { variableKey, label, questionType } = node.attrs ?? {};
+    const { variableKey, label, questionType, displayType } = node.attrs ?? {};
+
+    if (displayType === "inline_remarks_image") {
+      const raw = answers[variableKey];
+      let data: { images?: string[] } | null = null;
+      try { data = JSON.parse(raw as string); } catch { /* fall through */ }
+      const images = data?.images ?? [];
+      if (!images.length) return "-";
+      return images.map((src, i) => `![${label} ${i + 1}](${src})`).join("\n");
+    }
+
     return resolveInlineValue(variableKey, label, questionType, answers);
   }
   if (node.content) return node.content.map((n) => inlineToMarkdown(n, answers)).join("");

@@ -11,7 +11,7 @@
 
 Report Builder V2.0 is a document-first report template editor that replaces the coordinate-based drag-and-drop approach of V1.0 with a rich text document canvas.
 
-Solution creators write report templates like a document — headings, paragraphs, tables, lists — and insert workflow variables (form answers, approvals) directly into the template as inline chips within text or as standalone question-answer blocks. The builder supports multi-response variables, multi-field compound variables, approval blocks, and remarks and image attachments per question. Templates can be previewed with sample data and exported as PDF or Markdown.
+Solution creators write report templates like a document — headings, paragraphs, tables, lists — and insert workflow variables (form answers, approvals) directly into the template as inline chips within text or as standalone question-answer blocks. The builder supports multi-response variables, multi-field compound variables, approval blocks, and remarks and image attachments per question. Templates can be previewed with sample data and exported as PDF.
 
 ---
 
@@ -31,7 +31,6 @@ Report Builder V1.0 uses an X/Y coordinate drag-and-drop layout where creators p
 - No support for multi-response variables (questions with multiple answers).
 - No support for multi-field (compound) questions with sub-questions.
 - No support for remarks or image evidence attached to individual questions.
-- No way to include collection / database query results in a report.
 - The preview does not accurately reflect the generated output.
 - No in-builder PDF export.
 
@@ -43,18 +42,19 @@ Report Builder V2.0 provides the main editor framework for creating report templ
 
 [RB2-FR1] Rich Text Editor Canvas
 [RB2-FR2] Variable Insertion (@ Menu)
-[RB2-FR3] Inline Variable Display
-[RB2-FR4] Block Variable Display & Width Control
-[RB2-FR5] Multi-Response Variable Support
-[RB2-FR6] Multi-Field Variable Support
-[RB2-FR7] Multi-Field + Multi-Response Table View
-[RB2-FR8] Remarks & Image Support
-[RB2-FR9] Approval Variable Blocks
-[RB2-FR10] Block Handle (Add & Drag)
-[RB2-FR11] Pageless / A4 Page Mode
-[RB2-FR12] Report Preview
-[RB2-FR13] Report Export (PDF)
-[RB2-FR14] Template Persistence (Save / Load JSON)
+[RB2-FR3] Execution & System Variables
+[RB2-FR4] Inline Variable Display
+[RB2-FR5] Block Variable Display & Width Control
+[RB2-FR6] Multi-Response Variable Support
+[RB2-FR7] Multi-Field Variable Support
+[RB2-FR8] Multi-Field + Multi-Response Table View
+[RB2-FR9] Remarks & Image Support
+[RB2-FR10] Approval Variable Blocks
+[RB2-FR11] Block Handle (Add & Drag)
+[RB2-FR12] Pageless / A4 Page Mode
+[RB2-FR13] Report Preview
+[RB2-FR14] Report Export (PDF)
+[RB2-FR15] Template Persistence (Save / Load JSON)
 
 ### Question Types
 
@@ -88,7 +88,7 @@ The following question types are supported across the form variable system. Each
 **Location**
 - location — GPS coordinates or address
 
-**Approval** *(special type — see RB2-FR9)*
+**Approval** *(special type — see RB2-FR10)*
 - approval — a structured approval decision (approved or rejected) with person, date, signature or remarks, and optional images
 
 
@@ -121,7 +121,7 @@ Replace the coordinate-based V1.0 canvas with a document editor that lets creato
 - Bubble menu appears on text selection for quick formatting
 - `/` command menu for block insertion
 - `@` mention menu for variable insertion (see RB2-FR2)
-- Block handle on hover for drag-reorder and inline block insertion (see RB2-FR10)
+- Block handle on hover for drag-reorder and inline block insertion (see RB2-FR11)
 
 ### / Slash Command Menu
 
@@ -152,7 +152,7 @@ Replace the coordinate-based V1.0 canvas with a document editor that lets creato
 ## [RB2-FR2] Variable Insertion (@ Menu)
 
 ### Purpose
-Let creators insert workflow variables and collection data into the template without leaving the keyboard.
+Let creators insert any workflow variable into the template without leaving the keyboard. Variables are organised into three categories — Form, Approval, and Execution — accessible via tabs in the @ menu.
 
 ### Expected Behaviour
 
@@ -162,9 +162,10 @@ Let creators insert workflow variables and collection data into the template wit
 - Pressing Escape dismisses without inserting
 
 **Tabs**
-- The @ menu has two tabs: **Form** and **Approval**
-- Form: shows all form question variables
-- Approval: shows all approval-type variables
+- The @ menu has three tabs: **Form**, **Approval**, and **Execution**
+- **Form** — all form question variables (answers submitted by respondents)
+- **Approval** — all approval-type variables (decisions, signatures, remarks)
+- **Execution** — workflow execution metadata and form block submission metadata (see RB2-FR3)
 
 **Inserting a variable**
 - Selecting a variable inserts it as an inline chip by default
@@ -179,17 +180,18 @@ Let creators insert workflow variables and collection data into the template wit
 
 **Structure:**
 ```
-┌─────────────────────────┐
-│  Form | Approval        │  ← tab bar
-├─────────────────────────┤
-│  [icon]  Variable Label │
-│  [icon]  Variable Label │
-│  ...                    │
-└─────────────────────────┘
+┌──────────────────────────────────┐
+│  Form | Approval | Execution     │  ← tab bar
+├──────────────────────────────────┤
+│  [icon]  Variable Label          │
+│  [icon]  Variable Label          │
+│  ...                             │
+└──────────────────────────────────┘
 ```
 
 **Row anatomy:**
 - Question-type icon + variable label
+- Execution tab rows use an orange highlight to distinguish from Form (blue) and Approval
 - Row highlights on hover and keyboard selection
 - Click or Enter inserts the variable
 
@@ -197,7 +199,37 @@ Let creators insert workflow variables and collection data into the template wit
 
 ---
 
-## [RB2-FR3] Inline Variable Display
+## [RB2-FR3] Execution & System Variables
+
+### Purpose
+Define the set of system-generated variables that describe the workflow execution and form block submissions. These are not user-answered questions — they are operational metadata automatically captured by the platform when a workflow runs.
+
+### Variable Groups
+
+**Execution-level** — one set per workflow run
+- Execution ID — unique identifier for this execution
+- Started By — the user who triggered the workflow execution
+- Started At — date and time the execution was started
+- Project — the project this execution is associated with
+- Workflow Title — the name of the workflow template
+- Execution Status — current state of the execution (e.g. In Progress, Completed)
+
+**Form block submission metadata** — one set per form node in the workflow
+- {Form Block Name} — Submitted By — the user who submitted that form block
+- {Form Block Name} — Submitted At — the date and time that form block was submitted
+- Each form node in the workflow produces its own pair of Submitted By / Submitted At variables, named after the block (e.g. "Site Inspection Form — Submitted By")
+
+### Placement in @ Menu
+- All execution and form block metadata variables appear under the **Execution** tab in the @ menu
+- They are not mixed into the Form tab, which is reserved for question answers only
+
+### In Preview and Export
+- All system variables are replaced with their values at the time of report generation
+- In the prototype, sample values are used (e.g. "EX-2026-05-001", "Denzyl Chua")
+
+---
+
+## [RB2-FR4] Inline Variable Display
 
 ### Purpose
 Allow variables to appear embedded within sentences or paragraphs, rendering their answer value inline alongside surrounding text.
@@ -216,10 +248,10 @@ Allow variables to appear embedded within sentences or paragraphs, rendering the
   - **Answer** — shows the answer value (default)
   - **Remarks** — shows the remarks text for that answer; chip label shows `{label} · remarks`
   - **Remarks Image** — shows the remarks image for that answer; chip label shows `{label} · image`
-- Remarks and Remarks Image options are only available if the question has "Allow Remarks" enabled (see RB2-FR8)
+- Remarks and Remarks Image options are only available if the question has "Allow Remarks" enabled (see RB2-FR9)
 
 **Switching to block**
-- From the inline 3-dot menu, the creator can switch the variable to block display (see RB2-FR4)
+- From the inline 3-dot menu, the creator can switch the variable to block display (see RB2-FR5)
 
 **In preview and export**
 - The chip is replaced by the actual answer value, remarks text, or remarks image depending on the display type
@@ -256,7 +288,7 @@ Allow variables to appear embedded within sentences or paragraphs, rendering the
 
 ---
 
-## [RB2-FR4] Block Variable Display & Width Control
+## [RB2-FR5] Block Variable Display & Width Control
 
 ### Purpose
 Allow variables to occupy a dedicated area in the report, displaying the question label and answer value as a standalone card. Creators control how wide each block is relative to the page.
@@ -345,7 +377,7 @@ The remarks + image section only appears when "Allow Remarks" is enabled on the 
 
 ---
 
-## [RB2-FR5] Multi-Response Variable Support
+## [RB2-FR6] Multi-Response Variable Support
 
 ### Purpose
 Support variables where the respondent has given multiple answers. Multi-response variables render each answer as a separate entry.
@@ -383,7 +415,7 @@ Support variables where the respondent has given multiple answers. Multi-respons
 
 ---
 
-## [RB2-FR6] Multi-Field Variable Support
+## [RB2-FR7] Multi-Field Variable Support
 
 ### Purpose
 Support compound variables with named sub-questions. Multi-field variables group related sub-questions under one parent.
@@ -403,7 +435,7 @@ Support compound variables with named sub-questions. Multi-field variables group
 - Renders as stacked sub-field cards, each showing the sub-field label and a type-appropriate placeholder
 
 **Block preview — Multi Field + Multi Response**
-- Renders as a table (see RB2-FR7)
+- Renders as a table (see RB2-FR8)
 
 ### Multi-Field Block Layout (no Multi Response)
 
@@ -424,7 +456,7 @@ Support compound variables with named sub-questions. Multi-field variables group
 
 ---
 
-## [RB2-FR7] Multi-Field + Multi-Response Table View
+## [RB2-FR8] Multi-Field + Multi-Response Table View
 
 ### Purpose
 When a variable has both Multi Field and Multi Response active, render it as a table where columns are sub-fields and rows are response instances. Creators can control column header labels, relative widths, and display order directly in the editor.
@@ -471,7 +503,7 @@ When a variable has both Multi Field and Multi Response active, render it as a t
 
 ---
 
-## [RB2-FR8] Remarks & Image Support
+## [RB2-FR9] Remarks & Image Support
 
 ### Purpose
 Allow solution creators to mark individual form questions as supporting remarks, so that respondents can attach a text note and up to one image as evidence alongside their answer. The report template can then display these remarks as block sections or as inline references.
@@ -521,7 +553,7 @@ Allow solution creators to mark individual form questions as supporting remarks,
 
 ---
 
-## [RB2-FR9] Approval Variable Blocks
+## [RB2-FR10] Approval Variable Blocks
 
 ### Purpose
 Render approval decisions (approved or rejected) as structured blocks with a fixed layout that shows all relevant approval metadata.
@@ -578,7 +610,7 @@ Render approval decisions (approved or rejected) as structured blocks with a fix
 ---
 
 
-## [RB2-FR10] Block Handle (Add & Drag)
+## [RB2-FR11] Block Handle (Add & Drag)
 
 ### Purpose
 Give creators a way to add new blocks adjacent to any existing block and to reorder blocks by dragging, without using the keyboard.
@@ -620,7 +652,7 @@ Give creators a way to add new blocks adjacent to any existing block and to reor
 
 ---
 
-## [RB2-FR11] Pageless / A4 Page Mode
+## [RB2-FR12] Pageless / A4 Page Mode
 
 ### Purpose
 Let creators choose between a pageless scrolling canvas and a paginated A4 canvas.
@@ -644,7 +676,7 @@ Let creators choose between a pageless scrolling canvas and a paginated A4 canva
 
 ---
 
-## [RB2-FR12] Report Preview
+## [RB2-FR13] Report Preview
 
 ### Purpose
 Let solution creators see how the end user will experience the report once their form answers are submitted. The preview simulates the end-user report viewer — not an A4 export view.
@@ -702,7 +734,7 @@ Let solution creators see how the end user will experience the report once their
 
 ---
 
-## [RB2-FR13] Report Export (PDF)
+## [RB2-FR14] Report Export (PDF)
 
 ### Purpose
 Let creators export the rendered report as a PDF.
@@ -717,7 +749,7 @@ Let creators export the rendered report as a PDF.
 
 ---
 
-## [RB2-FR14] Template Persistence (Save / Load JSON)
+## [RB2-FR15] Template Persistence (Save / Load JSON)
 
 ### Purpose
 Allow report templates to be saved and restored.
