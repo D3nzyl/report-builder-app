@@ -31,6 +31,7 @@ export const QuestionVariableInlineNode = Node.create({
       label: { default: "" },
       questionType: { default: "short_text" },
       displayType: { default: "inline_value" },
+      colSpan: { default: 4 },
     };
   },
 

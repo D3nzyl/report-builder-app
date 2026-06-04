@@ -44,11 +44,15 @@ function inlineToHtml(nodes: JSONContent[], answers: FormAnswers): string {
       }
 
       if (displayType === "inline_remarks_image") {
+        const span = Math.min(12, Math.max(4, (n.attrs?.colSpan ?? 4) as number));
+        const w = `${Math.round((span / 12) * 100)}%`;
         let data: { images?: string[] } | null = null;
         try { data = JSON.parse(raw as string); } catch { /* fall through */ }
         const images = data?.images ?? [];
-        if (!images.length) return `<span style="color:#9ca3af;font-size:.875em;">No images</span>`;
-        return images.map(src => `<img src="${esc(src)}" alt="" style="max-width:100%;border-radius:6px;display:block;margin:4px 0;" />`).join("");
+        const inner = images.length
+          ? images.map(src => `<img src="${esc(src)}" alt="" style="max-width:100%;border-radius:6px;display:block;margin:4px 0;" />`).join("")
+          : `<span style="color:#9ca3af;font-size:.875em;">No images</span>`;
+        return `<span style="display:inline-block;width:${w};vertical-align:top;padding:0 3px;box-sizing:border-box;">${inner}</span>`;
       }
 
       const val = formatScalar(raw, questionType);

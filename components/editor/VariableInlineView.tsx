@@ -7,14 +7,30 @@ import { MoreHorizontal, Trash2, AlignJustify, Type, MessageSquare, ImageIcon } 
 import { useQuestions } from "@/lib/questionContext";
 import { createPortal } from "react-dom";
 
+const COLS = 12;
+const MIN_COLS = 4;
+
+function GripDots({ active }: { active: boolean }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-[3px]">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <div key={i} className={`w-[3px] h-[3px] rounded-full transition-colors ${active ? "bg-blue-400" : "bg-gray-400"}`} />
+      ))}
+    </div>
+  );
+}
+
 export function VariableInlineView({ node, editor, getPos, deleteNode, updateAttributes }: NodeViewProps) {
-  const { label, variableKey, questionType, questionId, displayType } = node.attrs as {
+  const { label, variableKey, questionType, questionId, displayType, colSpan: rawColSpan } = node.attrs as {
     label: string;
     variableKey: string;
     questionType: string;
     questionId: string;
     displayType: string;
+    colSpan: number;
   };
+
+  const colSpan = rawColSpan ?? 4;
 
   const { questions } = useQuestions();
   const question = questions.find(q => q.id === questionId);
@@ -24,6 +40,7 @@ export function VariableInlineView({ node, editor, getPos, deleteNode, updateAtt
   const [hovered, setHovered] = useState(false);
   const [isInSelection, setIsInSelection] = useState(false);
   const [chipRect, setChipRect] = useState<DOMRect | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const menuRef = useRef<HTMLSpanElement>(null);
   const chipRef = useRef<HTMLSpanElement>(null);
 
@@ -82,6 +99,31 @@ export function VariableInlineView({ node, editor, getPos, deleteNode, updateAtt
     }).run();
   }
 
+  function onResizeMouseDown(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    const blockEl = chipRef.current;
+    if (!blockEl) return;
+    const blockLeft = blockEl.getBoundingClientRect().left;
+    const totalWidth = blockEl.offsetWidth * (COLS / Math.max(1, colSpan));
+    setIsDragging(true);
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    function onMouseMove(ev: MouseEvent) {
+      const next = Math.min(COLS, Math.max(MIN_COLS, Math.round(((ev.clientX - blockLeft) / totalWidth) * COLS)));
+      updateAttributes({ colSpan: next });
+    }
+    function onMouseUp() {
+      setIsDragging(false);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    }
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  }
+
   const showDot = hovered || menuOpen;
   const chipBg = isInSelection ? "#eff6ff" : "#f3f4f6";
   const chipBorder = isInSelection ? "#93c5fd" : "#e5e7eb";
@@ -93,6 +135,90 @@ export function VariableInlineView({ node, editor, getPos, deleteNode, updateAtt
     : displayType === "inline_remarks_image"
       ? " · image"
       : "";
+
+  if (displayType === "inline_remarks_image") {
+    const widthPct = `${Math.round((colSpan / COLS) * 100)}%`;
+    const showHandle = hovered || isDragging;
+    return (
+      <NodeViewWrapper
+        as="span"
+        contentEditable={false}
+        style={{ display: "inline-block", width: widthPct, verticalAlign: "top", position: "relative", padding: "0 3px", boxSizing: "border-box" }}
+      >
+        <span
+          ref={chipRef}
+          className="block rounded-lg bg-white"
+          style={{ border: `1px solid ${isDragging ? "#93c5fd" : hovered ? "#d1d5db" : "#e5e7eb"}`, transition: "border-color 0.1s" }}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => { if (!isDragging) setHovered(false); }}
+        >
+          <span className="flex items-center justify-between gap-2 px-3 pt-2 pb-1">
+            <span className="text-xs font-semibold text-gray-700 truncate min-w-0">{label}</span>
+            <span ref={menuRef} className="relative flex-shrink-0">
+              <button
+                className="flex items-center justify-center w-5 h-5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all"
+                style={{ opacity: showHandle ? 1 : 0, pointerEvents: showHandle ? "auto" : "none" }}
+                onMouseDown={(e) => { e.preventDefault(); setMenuOpen(o => !o); }}
+                tabIndex={-1}
+              >
+                <MoreHorizontal size={11} />
+              </button>
+              {menuOpen && (
+                <span className="absolute right-0 top-[calc(100%+4px)] z-50 bg-white border border-gray-200 rounded-lg shadow-lg py-0.5 w-40 flex flex-col">
+                  <span className="px-2.5 py-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Show</span>
+                  <button className="flex items-center gap-2 px-2.5 py-1.5 hover:bg-gray-50 text-gray-700 text-left text-xs"
+                    onMouseDown={(e) => { e.preventDefault(); switchDisplayType("inline_value"); }}>
+                    <Type size={11} className="text-gray-400 flex-shrink-0" />Answer
+                  </button>
+                  {allowRemarks && (
+                    <button className="flex items-center gap-2 px-2.5 py-1.5 hover:bg-gray-50 text-gray-700 text-left text-xs"
+                      onMouseDown={(e) => { e.preventDefault(); switchDisplayType("inline_remarks"); }}>
+                      <MessageSquare size={11} className="text-gray-400 flex-shrink-0" />Remarks
+                    </button>
+                  )}
+                  {allowRemarks && (
+                    <button className="flex items-center gap-2 px-2.5 py-1.5 hover:bg-gray-50 text-gray-700 text-left text-xs"
+                      onMouseDown={(e) => { e.preventDefault(); switchDisplayType("inline_remarks_image"); }}>
+                      <ImageIcon size={11} className="text-gray-400 flex-shrink-0" />Remarks Image
+                      <span className="ml-auto text-gray-400 text-[10px]">✓</span>
+                    </button>
+                  )}
+                  <span className="border-t border-gray-100 my-0.5" />
+                  <span className="px-2.5 py-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Layout</span>
+                  <button className="flex items-center gap-2 px-2.5 py-1.5 hover:bg-gray-50 text-gray-700 text-left text-xs"
+                    onMouseDown={(e) => { e.preventDefault(); switchToBlock(); }}>
+                    <AlignJustify size={11} className="text-gray-400 flex-shrink-0" />Switch to Block
+                  </button>
+                  <span className="border-t border-gray-100 my-0.5" />
+                  <button className="flex items-center gap-2 px-2.5 py-1.5 hover:bg-red-50 text-red-600 text-left text-xs"
+                    onMouseDown={(e) => { e.preventDefault(); deleteNode(); }}>
+                    <Trash2 size={11} />Delete
+                  </button>
+                </span>
+              )}
+            </span>
+          </span>
+          <span className="flex flex-col items-center justify-center gap-1 mx-3 mb-3 py-4 rounded-md border-2 border-dashed border-gray-200 bg-gray-50">
+            <ImageIcon size={18} className="text-gray-300" />
+            <span className="text-[10px] text-gray-300">Remarks image</span>
+          </span>
+        </span>
+        <span
+          onMouseDown={onResizeMouseDown}
+          style={{
+            position: "absolute", right: -7, top: 0, bottom: 0, width: 14,
+            cursor: "col-resize", display: "flex", alignItems: "center", justifyContent: "center",
+            opacity: showHandle ? 1 : 0, pointerEvents: showHandle ? "auto" : "none",
+            zIndex: 20, transition: "opacity 0.1s",
+          }}
+        >
+          <span style={{ width: 6, height: 36, borderRadius: 4, background: isDragging ? "#bfdbfe" : "#d1d5db", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <GripDots active={isDragging} />
+          </span>
+        </span>
+      </NodeViewWrapper>
+    );
+  }
 
   return (
     <NodeViewWrapper as="span" className="inline-flex items-center" contentEditable={false}>
