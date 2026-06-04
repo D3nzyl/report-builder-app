@@ -145,19 +145,26 @@ export function VariableInlineView({ node, editor, getPos, deleteNode, updateAtt
         contentEditable={false}
         style={{ display: "inline-block", width: widthPct, verticalAlign: "top", position: "relative", padding: "0 3px", boxSizing: "border-box" }}
       >
+        {/* Outer hover zone wraps card + handle so moving to the handle doesn't drop hover */}
         <span
-          ref={chipRef}
-          className="block rounded-lg bg-white"
-          style={{ border: `1px solid ${isDragging ? "#93c5fd" : hovered ? "#d1d5db" : "#e5e7eb"}`, transition: "border-color 0.1s" }}
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => { if (!isDragging) setHovered(false); }}
+          className="block relative"
+          onMouseEnter={() => { setHovered(true); setChipRect(chipRef.current?.getBoundingClientRect() ?? null); }}
+          onMouseLeave={() => { if (!isDragging) { setHovered(false); setChipRect(null); } }}
         >
-          <span className="flex items-center justify-between gap-2 px-3 pt-2 pb-1">
-            <span className="text-xs font-semibold text-gray-700 truncate min-w-0">{label}</span>
-            <span ref={menuRef} className="relative flex-shrink-0">
+          {/* Card — no label, just image placeholder */}
+          <span
+            ref={chipRef}
+            className="block relative rounded-lg bg-white"
+            style={{ border: `1px solid ${isDragging ? "#93c5fd" : hovered ? "#d1d5db" : "#e5e7eb"}`, transition: "border-color 0.1s" }}
+          >
+            {/* 3-dot overlaid top-right */}
+            <span
+              ref={menuRef}
+              className="absolute top-1.5 right-1.5 z-10"
+              style={{ opacity: showHandle ? 1 : 0, pointerEvents: showHandle ? "auto" : "none", transition: "opacity 0.1s" }}
+            >
               <button
-                className="flex items-center justify-center w-5 h-5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all"
-                style={{ opacity: showHandle ? 1 : 0, pointerEvents: showHandle ? "auto" : "none" }}
+                className="flex items-center justify-center w-5 h-5 rounded bg-white/80 hover:bg-gray-100 text-gray-400 hover:text-gray-600 shadow-sm transition-all"
                 onMouseDown={(e) => { e.preventDefault(); setMenuOpen(o => !o); }}
                 tabIndex={-1}
               >
@@ -197,25 +204,58 @@ export function VariableInlineView({ node, editor, getPos, deleteNode, updateAtt
                 </span>
               )}
             </span>
+
+            <span className="flex flex-col items-center justify-center gap-1 m-2 py-5 rounded-md border-2 border-dashed border-gray-200 bg-gray-50">
+              <ImageIcon size={18} className="text-gray-300" />
+              <span className="text-[10px] text-gray-300">Remarks image</span>
+            </span>
           </span>
-          <span className="flex flex-col items-center justify-center gap-1 mx-3 mb-3 py-4 rounded-md border-2 border-dashed border-gray-200 bg-gray-50">
-            <ImageIcon size={18} className="text-gray-300" />
-            <span className="text-[10px] text-gray-300">Remarks image</span>
+
+          {/* Resize handle — inside hover zone so mouse entering it keeps hovered=true */}
+          <span
+            onMouseDown={onResizeMouseDown}
+            style={{
+              position: "absolute", right: -10, top: 0, bottom: 0, width: 20,
+              cursor: "col-resize", display: "flex", alignItems: "center", justifyContent: "center",
+              opacity: showHandle ? 1 : 0, pointerEvents: showHandle ? "auto" : "none",
+              zIndex: 20, transition: "opacity 0.1s",
+            }}
+          >
+            <span style={{ width: 6, height: 36, borderRadius: 4, background: isDragging ? "#bfdbfe" : "#d1d5db", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <GripDots active={isDragging} />
+            </span>
           </span>
         </span>
-        <span
-          onMouseDown={onResizeMouseDown}
-          style={{
-            position: "absolute", right: -7, top: 0, bottom: 0, width: 14,
-            cursor: "col-resize", display: "flex", alignItems: "center", justifyContent: "center",
-            opacity: showHandle ? 1 : 0, pointerEvents: showHandle ? "auto" : "none",
-            zIndex: 20, transition: "opacity 0.1s",
-          }}
-        >
-          <span style={{ width: 6, height: 36, borderRadius: 4, background: isDragging ? "#bfdbfe" : "#d1d5db", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <GripDots active={isDragging} />
-          </span>
-        </span>
+
+        {/* Tooltip — same as regular chip */}
+        {hovered && !menuOpen && chipRect && createPortal(
+          <div
+            style={{
+              position: "fixed",
+              top: chipRect.top - 8,
+              left: chipRect.left + chipRect.width / 2,
+              transform: "translate(-50%, -100%)",
+              zIndex: 9999,
+              pointerEvents: "none",
+            }}
+          >
+            <div className="bg-gray-900 text-white text-[11px] rounded-lg px-2.5 py-1.5 whitespace-nowrap shadow-xl">
+              {question?.blockName && (
+                <div className="font-normal opacity-60 text-[10px] leading-none mb-1">{question.blockName}</div>
+              )}
+              <div className="font-medium leading-none">{label}</div>
+            </div>
+            <div
+              className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0"
+              style={{
+                borderLeft: "4px solid transparent",
+                borderRight: "4px solid transparent",
+                borderTop: "4px solid #111827",
+              }}
+            />
+          </div>,
+          document.body
+        )}
       </NodeViewWrapper>
     );
   }
